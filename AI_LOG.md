@@ -98,6 +98,15 @@
 
 ---
 
+### Prompt 9: Mirror Axis Overlay Removal
+> *"Remove this mirror axis because the user is not able to see the numbers on tiles"*
+
+- Removed the overlapping diagonal axis SVG line and `--- MIRROR AXIS 45° ---` badge from the 4×4 board frame.
+- Guaranteed all 14 numbers (`01` through `14`) and empty sockets are completely clear and legible on all viewports without visual obstructions.
+- Verified and deployed update to GitHub repository and live GitHub Pages site.
+
+---
+
 ## When AI Got It Wrong & How It Was Resolved
 
 ### 1. Browser Subagent Sandbox Dependency & Network Block
@@ -123,3 +132,7 @@
 ### 6. Shell `curl` Hang During HTTP Status Verification
 - **Issue**: Testing the newly activated GitHub Pages endpoint using PowerShell's `curl` alias caused the process to hang without terminating due to shell-specific proxy/DNS handling.
 - **Correction**: Replaced shell `curl` with Node's native `fetch()` API (`node -e "fetch('...').then(r => console.log(r.status))"`), which cleanly completed and confirmed `HTTP Status: 200` in under 2 seconds.
+
+### 7. Diagonal Mirror Axis Overlay Obscuring Grid Numbers
+- **Issue**: Faithfully transcribing the Stitch design mockup included a literal diagonal dashed axis line and a rotated badge (`--- MIRROR AXIS 45° ---`) across the center of the 4x4 matrix. In active gameplay, this badge physically covered tiles `06`, `07`, `09`, and `10`, making their numbers difficult to read.
+- **Correction**: Removed the overlapping diagonal axis SVG and badge from the playable puzzle matrix so all 14 tile numbers are 100% visible and unobstructed, while preserving the concept cleanly in the left telemetry schematic panel and the technical manual.
