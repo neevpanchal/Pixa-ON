@@ -680,36 +680,6 @@
       z-index: 2;
     }
 
-    /* 45° Diagonal Mirror Axis Line & Badge */
-    .mirror-axis-overlay {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 4;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .mirror-axis-svg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    .mirror-axis-badge {
-      background-color: rgba(13, 12, 10, 0.92);
-      border: 1px solid var(--amber-dark);
-      color: var(--amber);
-      font-size: 6.5px;
-      padding: 3px 6px;
-      white-space: nowrap;
-      transform: rotate(-45deg);
-      box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
-      letter-spacing: 0.5px;
-    }
-
     /* Grid Cells */
     .cell {
       position: relative;
@@ -1694,22 +1664,10 @@
             </div>
 
             <div class="board-grid-wrapper">
-              
-              <!-- 45° Diagonal Mirror Axis Line & Badge -->
-              <div class="mirror-axis-overlay">
-                <svg class="mirror-axis-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                  <line x1="0" y1="100" x2="100" y2="0" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.8" />
-                </svg>
-                <div class="mirror-axis-badge">
-                  --- MIRROR AXIS 45° ---
-                </div>
-              </div>
-
               <!-- The 16 Cells Grid -->
               <div id="board-grid" class="board-grid">
                 <!-- 16 Cells rendered dynamically -->
               </div>
-
             </div>
 
             <div class="grid-status-footer">
