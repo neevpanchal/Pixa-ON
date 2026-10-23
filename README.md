@@ -2,7 +2,7 @@
 
 > *"Classic sliding tiles, but every deliberate move you make is mirrored on the opposite side of the board."*
 
-🔗 **Live Playable Game**: [https://neevpanchal.github.io/Pixa-ON/](https://neevpanchal.github.io/Pixa-ON/)
+🔗 **Live Playable Game Link**: [https://neevpanchal.github.io/Pixa-ON/](https://neevpanchal.github.io/Pixa-ON/)
 
 [![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Pure Vanilla](https://img.shields.io/badge/tech-HTML5%20%7C%20CSS3%20%7C%20JS-F59E0B.svg)](#technology-stack)
