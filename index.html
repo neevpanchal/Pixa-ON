@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mirror Slide - Mirrored Sliding Tile Puzzle</title>
+  
+  <!-- Retro Pixel Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       THEME & DESIGN SYSTEM (NO GRADIENTS, HARD OFFSET SHADOWS, RETRO PIXEL LOOK)
+       ========================================================================== */
+    :root {
+      --bg-cream: #FAF6ED;
+      --board-bg: #F1EAD8;
+      --tile-bg: #FFFDF9;
+      --tile-hover: #FFF8E7;
+      --navy: #0D1F3C;
+      --navy-light: #233C63;
+      --gold: #F59E0B;
+      --gold-dark: #D97706;
+      --gold-light: #FEF3C7;
+      --slot-empty: #E5DEC9;
+      --border-width: 3px;
+      --shadow-sm: 2px 2px 0px var(--navy);
+      --shadow-md: 4px 4px 0px var(--navy);
+      --shadow-lg: 6px 6px 0px var(--navy);
+      --shadow-xl: 8px 8px 0px var(--navy);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      font-family: 'Press Start 2P', 'Courier New', monospace;
+      color: var(--navy);
+      background-color: var(--bg-cream);
+      /* Crisp graph-paper background pattern using pure SVG strokes (STRICTLY NO GRADIENTS) */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M 24 0 L 0 0 0 24' fill='none' stroke='%23DCD3C0' stroke-width='1'/%3E%3C/svg%3E");
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      line-height: 1.5;
+    }
+
+    /* Screen containers */
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 480px;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* Chunky Pixel Buttons */
+    .btn {
+      font-family: 'Press Start 2P', 'Courier New', monospace;
+      font-size: 10px;
+      color: var(--navy);
+      background-color: var(--tile-bg);
+      border: var(--border-width) solid var(--navy);
+      box-shadow: var(--shadow-md);
+      padding: 10px 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      outline: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.05s ease, box-shadow 0.05s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--tile-hover);
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0px var(--navy);
+    }
+
+    .btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px var(--navy);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-gold {
+      background-color: var(--gold);
+      color: var(--navy);
+    }
+
+    .btn-gold:hover {
+      background-color: #FBBF24;
+    }
+
+    .btn-lg {
+      font-size: 13px;
+      padding: 15px 24px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-lg:hover {
+      box-shadow: 7px 7px 0px var(--navy);
+    }
+
+    /* Title & Headers */
+    .game-logo {
+      font-size: 26px;
+      letter-spacing: -1px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .gold-accent-text {
+      color: var(--gold-dark);
+      text-shadow: 2px 2px 0px var(--navy);
+    }
+
+    /* Required exact description text */
+    .subtitle-card {
+      background-color: var(--tile-bg);
+      border: var(--border-width) solid var(--navy);
+      box-shadow: var(--shadow-md);
+      padding: 16px;
+      margin: 14px 0 20px 0;
+      font-size: 10.5px;
+      line-height: 1.8;
+      text-align: center;
+    }
+
+    .menu-box {
+      width: 100%;
+      background-color: var(--board-bg);
+      border: 4px solid var(--navy);
+      box-shadow: var(--shadow-lg);
+      padding: 22px 18px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .level-select-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .level-card-btn {
+      width: 100%;
+      text-align: left;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background-color: var(--tile-bg);
+      border: var(--border-width) solid var(--navy);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+    }
+
+    .level-card-btn:hover {
+      background-color: var(--gold-light);
+      transform: translate(-1px, -1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .level-card-btn.current {
+      border: 3px solid var(--gold-dark);
+      background-color: #FFFBEB;
+    }
+
+    .level-card-title {
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--navy);
+    }
+
+    .level-card-hint {
+      font-size: 8.5px;
+      line-height: 1.4;
+      color: var(--navy-light);
+    }
+
+    /* Gameplay Header */
+    .game-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .level-badge {
+      font-size: 10px;
+      background-color: var(--tile-bg);
+      border: 2px solid var(--navy);
+      box-shadow: var(--shadow-sm);
+      padding: 6px 10px;
+      font-weight: bold;
+    }
+
+    .stats-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--tile-bg);
+      border: var(--border-width) solid var(--navy);
+      box-shadow: var(--shadow-sm);
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      font-size: 11px;
+    }
+
+    .stat-moves {
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-moves span {
+      color: var(--gold-dark);
+    }
+
+    /* Hint Alert Banner */
+    .hint-banner {
+      width: 100%;
+      background-color: var(--gold-light);
+      border: 2px dashed var(--navy);
+      box-shadow: var(--shadow-sm);
+      padding: 8px 10px;
+      font-size: 8.5px;
+      line-height: 1.5;
+      margin-bottom: 14px;
+      text-align: left;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .hint-banner .hint-icon {
+      font-size: 10px;
+    }
+
+    /* 4x4 Puzzle Board */
+    .board-frame {
+      background-color: var(--board-bg);
+      border: 4px solid var(--navy);
+      box-shadow: var(--shadow-xl);
+      padding: 12px;
+      width: 100%;
+      max-width: 440px;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .board-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 8px;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Cells */
+    .cell {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Empty / Blank Slot */
+    .slot-blank {
+      width: 100%;
+      height: 100%;
+      background-color: var(--slot-empty);
+      border: 2px dashed var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.85;
+      box-sizing: border-box;
+    }
+
+    .slot-blank::after {
+      content: '◫';
+      font-size: 14px;
+      color: var(--navy);
+      opacity: 0.35;
+    }
+
+    /* Target Solved Blank Markers at cells 0 and 15 */
+    .cell[data-index="0"] .slot-blank::after,
+    .cell[data-index="15"] .slot-blank::after {
+      content: '★';
+      font-size: 13px;
+      color: var(--gold-dark);
+      opacity: 0.65;
+    }
+
+    /* Tile Element */
+    .tile {
+      width: 100%;
+      height: 100%;
+      background-color: var(--tile-bg);
+      border: var(--border-width) solid var(--navy);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--navy);
+      cursor: default;
+      position: relative;
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+
+    .tile-number {
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Movable Tiles (1 adjacent blank) */
+    .tile.movable {
+      cursor: pointer;
+    }
+
+    .tile.movable:hover {
+      background-color: var(--tile-hover);
+      border-color: var(--navy);
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Partner Highlight on Hover */
+    .tile.partner-highlight {
+      border: 3px solid var(--gold-dark);
+      background-color: #FEF3C7;
+    }
+
+    /* Dual-Direction Tile (adjacent to both blanks) */
+    .tile.dual-choice {
+      border: 3px solid var(--gold-dark);
+      background-color: #FFFBEB;
+    }
+
+    .tile.dual-choice .tile-number {
+      font-size: 15px;
+      opacity: 0.85;
+    }
+
+    /* Arrow Selector Buttons on Dual-Blank Tiles */
+    .dual-arrows-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .direction-arrow-btn {
+      position: absolute;
+      pointer-events: auto;
+      background-color: var(--gold);
+      color: var(--navy);
+      border: 2px solid var(--navy);
+      box-shadow: 1px 1px 0px var(--navy);
+      width: 24px;
+      height: 24px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 5;
+      transition: transform 0.05s ease, background-color 0.05s ease;
+    }
+
+    .direction-arrow-btn.arrow-up {
+      top: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .direction-arrow-btn.arrow-down {
+      bottom: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .direction-arrow-btn.arrow-left {
+      left: 3px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .direction-arrow-btn.arrow-right {
+      right: 3px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .direction-arrow-btn:hover {
+      background-color: #FEF08A;
+    }
+
+    .direction-arrow-btn.arrow-up:hover { transform: translateX(-50%) scale(1.15); }
+    .direction-arrow-btn.arrow-down:hover { transform: translateX(-50%) scale(1.15); }
+    .direction-arrow-btn.arrow-left:hover { transform: translateY(-50%) scale(1.15); }
+    .direction-arrow-btn.arrow-right:hover { transform: translateY(-50%) scale(1.15); }
+
+    .direction-arrow-btn:active {
+      box-shadow: 0px 0px 0px var(--navy);
+    }
+
+    /* Controls Bar */
+    .game-controls {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      margin-top: 18px;
+      justify-content: space-between;
+    }
+
+    .game-controls .btn {
+      flex: 1;
+      padding: 10px 4px;
+      font-size: 9px;
+    }
+
+    /* Instruction Footnote */
+    .rules-footnote {
+      margin-top: 14px;
+      font-size: 8.5px;
+      color: var(--navy-light);
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    /* Modals & Overlays (Win Screen & Level Select) */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background-color: rgba(13, 31, 60, 0.75);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background-color: var(--bg-cream);
+      border: 4px solid var(--navy);
+      box-shadow: var(--shadow-xl);
+      padding: 24px 20px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: modalPop 0.12s ease-out;
+    }
+
+    @keyframes modalPop {
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .win-title {
+      font-size: 16px;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .win-moves-summary {
+      font-size: 11px;
+      background-color: var(--tile-bg);
+      border: var(--border-width) solid var(--navy);
+      box-shadow: var(--shadow-sm);
+      padding: 14px;
+      line-height: 1.6;
+    }
+
+    .modal-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    /* Audio Mute Icon */
+    .sound-toggle-btn {
+      padding: 6px 10px;
+      font-size: 9px;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 420px) {
+      .game-logo { font-size: 20px; }
+      .tile { font-size: 15px; }
+      .tile.dual-choice .tile-number { font-size: 13px; }
+      .board-frame { padding: 8px; }
+      .board-grid { gap: 6px; }
+      .direction-arrow-btn { width: 20px; height: 20px; font-size: 9px; }
+      .btn { font-size: 8.5px; padding: 8px 6px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== 1. START SCREEN ==================== -->
+  <main id="start-screen" class="screen active">
+    <div class="game-logo">
+      <span>MIRROR</span>
+      <span class="gold-accent-text">SLIDE</span>
+    </div>
+
+    <!-- Required exact phrase -->
+    <div class="subtitle-card">
+      Classic sliding tiles, but every move you make is mirrored on the opposite side of the board.
+    </div>
+
+    <div class="menu-box">
+      <button id="btn-main-play" class="btn btn-gold btn-lg">
+        ▶ PLAY GAME
+      </button>
+
+      <div style="font-size: 10px; font-weight: bold; margin-top: 8px; text-align: left; text-transform: uppercase;">
+        SELECT LEVEL:
+      </div>
+
+      <div id="start-level-list" class="level-select-grid">
+        <!-- Level cards rendered dynamically -->
+      </div>
+    </div>
+
+    <div class="rules-footnote">
+      Goal: Tiles 1-14 in order, blanks at corners (0,0) and (3,3).
+    </div>
+  </main>
+
+  <!-- ==================== 2. GAMEPLAY SCREEN ==================== -->
+  <main id="game-screen" class="screen">
+    <!-- Header -->
+    <header class="game-header">
+      <button id="btn-back-to-menu" class="btn" title="Back to menu">
+        ◀ MENU
+      </button>
+      <div id="current-level-badge" class="level-badge">
+        LEVEL 1
+      </div>
+      <button id="btn-sound-toggle" class="btn sound-toggle-btn" title="Toggle sound">
+        🔊 ON
+      </button>
+    </header>
+
+    <!-- Stats Bar -->
+    <section class="stats-bar">
+      <div class="stat-moves">
+        MOVES: <span id="move-counter-display">0</span>
+      </div>
+      <button id="btn-toggle-hint" class="btn" style="font-size: 8.5px; padding: 4px 8px;">
+        💡 HINT
+      </button>
+    </section>
+
+    <!-- Hint Banner (Collapsible) -->
+    <aside id="hint-banner" class="hint-banner">
+      <span class="hint-icon">💡</span>
+      <span id="hint-text">Slide tile 1 to the right — watch how tile 14 copies the motion!</span>
+    </aside>
+
+    <!-- 4x4 Puzzle Board -->
+    <section class="board-frame" aria-label="4x4 Mirror Slide Board">
+      <div id="board-grid" class="board-grid">
+        <!-- 16 Cells rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- Game Controls: Undo, Restart, Levels -->
+    <nav class="game-controls">
+      <button id="btn-undo" class="btn" title="Undo Move (Z)">
+        ↶ UNDO (Z)
+      </button>
+      <button id="btn-restart" class="btn" title="Restart Level">
+        ⟲ RESTART
+      </button>
+      <button id="btn-open-levels" class="btn" title="Level Select">
+        ☰ LEVELS
+      </button>
+    </nav>
+
+    <footer class="rules-footnote">
+      Click a movable tile to slide it & its mirror partner simultaneously.
+    </footer>
+  </main>
+
+  <!-- ==================== 3. WIN SCREEN MODAL ==================== -->
+  <div id="win-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="win-title">
+    <div class="modal-card">
+      <div id="win-title" class="win-title">
+        <span class="gold-accent-text">★</span>
+        <span>PUZZLE SOLVED!</span>
+        <span class="gold-accent-text">★</span>
+      </div>
+
+      <div class="win-moves-summary">
+        <div id="win-level-name" style="font-weight: bold; margin-bottom: 6px;">Level 1</div>
+        <div>Completed in <span id="win-moves-count" class="gold-accent-text" style="font-weight: bold;">0</span> moves!</div>
+      </div>
+
+      <div class="modal-buttons">
+        <button id="btn-next-level" class="btn btn-gold btn-lg">
+          NEXT LEVEL ▶
+        </button>
+        <button id="btn-replay-level" class="btn">
+          ⟲ REPLAY LEVEL
+        </button>
+        <button id="btn-win-level-select" class="btn">
+          ☰ ALL LEVELS
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 4. LEVEL SELECT MODAL ==================== -->
+  <div id="levels-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div style="font-size: 13px; font-weight: bold;">
+        SELECT A LEVEL
+      </div>
+
+      <div id="modal-level-list" class="level-select-grid" style="max-height: 260px; overflow-y: auto;">
+        <!-- Level cards inserted dynamically -->
+      </div>
+
+      <button id="btn-close-levels-modal" class="btn" style="margin-top: 8px;">
+        ✕ CLOSE
+      </button>
+    </div>
+  </div>
+
+  <!-- Load Levels from external levels.js file as required -->
+  <script src="levels.js"></script>
+
+  <script>
+    /* ==========================================================================
+       FALLBACK LEVELS (in case levels.js is missing or blocked)
+       ========================================================================== */
+    if (typeof window.LEVELS === 'undefined' || !Array.isArray(window.LEVELS) || window.LEVELS.length === 0) {
+      window.LEVELS = [
+        {
+          name: "Level 1: First Reflection",
+          hint: "Slide tile 1 to the right — watch how tile 14 copies the motion!",
+          start: [1, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 14]
+        },
+        {
+          name: "Level 2: The Crossroads",
+          hint: "Tiles 6 and 9 touch both blanks! Click either directional arrow to choose your path.",
+          start: [1, 5, 2, 3, 4, 0, 6, 7, 8, 9, 0, 11, 12, 13, 10, 14]
+        },
+        {
+          name: "Level 3: Twin Dance",
+          hint: "The blanks travel down the outer columns. Bring tile 7 and tile 8 into place first.",
+          start: [1, 2, 3, 7, 4, 5, 6, 0, 0, 9, 10, 11, 8, 12, 13, 14]
+        }
+      ];
+    }
+
+    /* ==========================================================================
+       CORE GAME LOGIC (PURE FUNCTIONS - ISOLATED FROM UI)
+       ========================================================================== */
+
+    const DIRS = {
+      up: { dr: -1, dc: 0, name: 'up', opposite: 'down', arrow: '▲', className: 'arrow-up' },
+      down: { dr: 1, dc: 0, name: 'down', opposite: 'up', arrow: '▼', className: 'arrow-down' },
+      left: { dr: 0, dc: -1, name: 'left', opposite: 'right', arrow: '◀', className: 'arrow-left' },
+      right: { dr: 0, dc: 1, name: 'right', opposite: 'left', arrow: '▶', className: 'arrow-right' }
+    };
+
+    /**
+     * Pure function: applyMove(state, tileCell, direction)
+     * 
+     * Applies a mirrored sliding move to the 4x4 board.
+     * Tile in tileCell slides in direction into an adjacent blank (0).
+     * Simultaneously, the tile at mirrored cell (3-r, 3-c) slides in the mirrored direction.
+     * 
+     * @param {Array<number>} state - 16-element board array (0 = blank, 1-14 = tiles)
+     * @param {number} tileCell - Board index 0..15 of the tile to slide
+     * @param {string|object} direction - Direction: 'up' | 'down' | 'left' | 'right' or {dr, dc}
+     * @returns {Array<number>|null} - Cloned new board array or null if move is illegal
+     */
+    function applyMove(state, tileCell, direction) {
+      // Validate inputs
+      if (!Array.isArray(state) || state.length !== 16) return null;
+      if (typeof tileCell !== 'number' || tileCell < 0 || tileCell >= 16) return null;
+      if (state[tileCell] === 0) return null; // Can't move an empty blank
+
+      const dirObj = typeof direction === 'string' ? DIRS[direction.toLowerCase()] : direction;
+      if (!dirObj || typeof dirObj.dr !== 'number' || typeof dirObj.dc !== 'number') return null;
+
+      // Coordinates of tile 1
+      const r1 = Math.floor(tileCell / 4);
+      const c1 = tileCell % 4;
+
+      const targetR1 = r1 + dirObj.dr;
+      const targetC1 = c1 + dirObj.dc;
+
+      // Check bounds
+      if (targetR1 < 0 || targetR1 >= 4 || targetC1 < 0 || targetC1 >= 4) return null;
+      const targetIdx1 = targetR1 * 4 + targetC1;
+
+      // Target 1 must be blank
+      if (state[targetIdx1] !== 0) return null;
+
+      // Mirrored coordinates (point symmetry: r2 = 3 - r1, c2 = 3 - c1)
+      const r2 = 3 - r1;
+      const c2 = 3 - c1;
+      const tileCell2 = r2 * 4 + c2;
+
+      // Mirrored move direction is inverted: (-dr, -dc)
+      const targetR2 = r2 - dirObj.dr;
+      const targetC2 = c2 - dirObj.dc;
+
+      // Bounds check for mirrored tile
+      if (targetR2 < 0 || targetR2 >= 4 || targetC2 < 0 || targetC2 >= 4) return null;
+      const targetIdx2 = targetR2 * 4 + targetC2;
+
+      // Mirrored target must also be blank
+      if (state[targetIdx2] !== 0) return null;
+
+      // Construct pure new state copy
+      const nextState = [...state];
+      nextState[targetIdx1] = state[tileCell];
+      nextState[tileCell] = 0;
+      nextState[targetIdx2] = state[tileCell2];
+      nextState[tileCell2] = 0;
+
+      return nextState;
+    }
+
+    /**
+     * Pure function: isSolved(state)
+     * Win condition: tiles 1-14 in reading order in cells 1..14, blanks in cells 0 and 15.
+     */
+    function isSolved(state) {
+      if (!Array.isArray(state) || state.length !== 16) return false;
+      if (state[0] !== 0 || state[15] !== 0) return false;
+      for (let i = 1; i <= 14; i++) {
+        if (state[i] !== i) return false;
+      }
+      return true;
+    }
+
+    /**
+     * Pure helper: getLegalDirections(state, cell)
+     * Returns an array of direction names ('up' | 'down' | 'left' | 'right') valid for the tile at cell.
+     */
+    function getLegalDirections(state, cell) {
+      if (state[cell] === 0) return [];
+      const valid = [];
+      for (const d of ['up', 'down', 'left', 'right']) {
+        if (applyMove(state, cell, d) !== null) {
+          valid.push(d);
+        }
+      }
+      return valid;
+    }
+
+    /**
+     * Pure helper: getMirrorCell(cell)
+     */
+    function getMirrorCell(cell) {
+      return 15 - cell;
+    }
+
+    /* ==========================================================================
+       SYNTHESIZED 8-BIT RETRO AUDIO (WEB AUDIO API - ZERO EXTERNAL ASSETS)
+       ========================================================================== */
+
+    let audioCtx = null;
+    let isSoundMuted = false;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playSound(type) {
+      if (isSoundMuted) return;
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+
+        if (type === 'slide') {
+          // Retro slide blip
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(260, now);
+          osc.frequency.exponentialRampToValueAtTime(420, now + 0.08);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'undo') {
+          // Retro undo chirp
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(380, now);
+          osc.frequency.exponentialRampToValueAtTime(190, now + 0.1);
+          gain.gain.setValueAtTime(0.09, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        } else if (type === 'win') {
+          // Victory 4-note arpeggio (C5, E5, G5, C6)
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const start = now + idx * 0.11;
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(freq, start);
+            gain.gain.setValueAtTime(0.1, start);
+            gain.gain.exponentialRampToValueAtTime(0.001, start + 0.22);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(start);
+            osc.stop(start + 0.22);
+          });
+        }
+      } catch (e) {
+        // Audio policy or unsupported - silent fallback
+      }
+    }
+
+    /* ==========================================================================
+       GAME STATE & UI MANAGER
+       ========================================================================== */
+
+    const Game = {
+      currentLevelIndex: 0,
+      boardState: [],
+      history: [],
+      moveCount: 0,
+      isWon: false,
+      hoveredCell: null,
+
+      init() {
+        this.cacheDOM();
+        this.bindEvents();
+        this.renderStartScreenLevels();
+        this.renderModalLevels();
+      },
+
+      cacheDOM() {
+        this.dom = {
+          startScreen: document.getElementById('start-screen'),
+          gameScreen: document.getElementById('game-screen'),
+          winModal: document.getElementById('win-modal'),
+          levelsModal: document.getElementById('levels-modal'),
+          startLevelList: document.getElementById('start-level-list'),
+          modalLevelList: document.getElementById('modal-level-list'),
+          boardGrid: document.getElementById('board-grid'),
+          moveCounterDisplay: document.getElementById('move-counter-display'),
+          currentLevelBadge: document.getElementById('current-level-badge'),
+          hintBanner: document.getElementById('hint-banner'),
+          hintText: document.getElementById('hint-text'),
+          winLevelName: document.getElementById('win-level-name'),
+          winMovesCount: document.getElementById('win-moves-count'),
+          btnMainPlay: document.getElementById('btn-main-play'),
+          btnBackToMenu: document.getElementById('btn-back-to-menu'),
+          btnSoundToggle: document.getElementById('btn-sound-toggle'),
+          btnToggleHint: document.getElementById('btn-toggle-hint'),
+          btnUndo: document.getElementById('btn-undo'),
+          btnRestart: document.getElementById('btn-restart'),
+          btnOpenLevels: document.getElementById('btn-open-levels'),
+          btnCloseLevelsModal: document.getElementById('btn-close-levels-modal'),
+          btnNextLevel: document.getElementById('btn-next-level'),
+          btnReplayLevel: document.getElementById('btn-replay-level'),
+          btnWinLevelSelect: document.getElementById('btn-win-level-select')
+        };
+      },
+
+      bindEvents() {
+        // Navigation buttons
+        this.dom.btnMainPlay.addEventListener('click', () => {
+          getAudioContext();
+          this.startLevel(0);
+        });
+
+        this.dom.btnBackToMenu.addEventListener('click', () => {
+          this.showScreen('start');
+        });
+
+        this.dom.btnSoundToggle.addEventListener('click', () => {
+          isSoundMuted = !isSoundMuted;
+          this.dom.btnSoundToggle.textContent = isSoundMuted ? '🔇 OFF' : '🔊 ON';
+        });
+
+        this.dom.btnToggleHint.addEventListener('click', () => {
+          const isHidden = this.dom.hintBanner.style.display === 'none';
+          this.dom.hintBanner.style.display = isHidden ? 'flex' : 'none';
+        });
+
+        // Game action buttons
+        this.dom.btnRestart.addEventListener('click', () => {
+          this.restartLevel();
+        });
+
+        this.dom.btnUndo.addEventListener('click', () => {
+          this.undoMove();
+        });
+
+        this.dom.btnOpenLevels.addEventListener('click', () => {
+          this.openLevelsModal();
+        });
+
+        this.dom.btnCloseLevelsModal.addEventListener('click', () => {
+          this.closeLevelsModal();
+        });
+
+        this.dom.btnNextLevel.addEventListener('click', () => {
+          this.closeWinModal();
+          const nextIdx = (this.currentLevelIndex + 1) % window.LEVELS.length;
+          this.startLevel(nextIdx);
+        });
+
+        this.dom.btnReplayLevel.addEventListener('click', () => {
+          this.closeWinModal();
+          this.restartLevel();
+        });
+
+        this.dom.btnWinLevelSelect.addEventListener('click', () => {
+          this.closeWinModal();
+          this.openLevelsModal();
+        });
+
+        // Keyboard Shortcut: Key Z for Undo, Key R for Restart
+        window.addEventListener('keydown', (e) => {
+          if (this.dom.gameScreen.classList.contains('active')) {
+            if (e.key === 'z' || e.key === 'Z') {
+              e.preventDefault();
+              this.undoMove();
+            } else if (e.key === 'r' || e.key === 'R') {
+              e.preventDefault();
+              this.restartLevel();
+            }
+          }
+        });
+      },
+
+      showScreen(screen) {
+        if (screen === 'start') {
+          this.dom.startScreen.classList.add('active');
+          this.dom.gameScreen.classList.remove('active');
+        } else {
+          this.dom.startScreen.classList.remove('active');
+          this.dom.gameScreen.classList.add('active');
+        }
+      },
+
+      startLevel(levelIndex) {
+        getAudioContext();
+        if (levelIndex < 0 || levelIndex >= window.LEVELS.length) {
+          levelIndex = 0;
+        }
+        this.currentLevelIndex = levelIndex;
+        const levelData = window.LEVELS[this.currentLevelIndex];
+
+        // Clone level start state
+        this.boardState = [...levelData.start];
+        this.history = [];
+        this.moveCount = 0;
+        this.isWon = false;
+        this.hoveredCell = null;
+
+        // Update headers & hints
+        this.dom.currentLevelBadge.textContent = `LVL ${this.currentLevelIndex + 1}/${window.LEVELS.length}`;
+        this.dom.hintText.textContent = levelData.hint || "Align tiles 1-14 with corners blank.";
+        this.dom.hintBanner.style.display = 'flex';
+        this.updateStats();
+
+        this.renderBoard();
+        this.showScreen('game');
+        this.renderStartScreenLevels();
+        this.renderModalLevels();
+      },
+
+      restartLevel() {
+        const levelData = window.LEVELS[this.currentLevelIndex];
+        this.boardState = [...levelData.start];
+        this.history = [];
+        this.moveCount = 0;
+        this.isWon = false;
+        this.hoveredCell = null;
+        this.updateStats();
+        this.renderBoard();
+        playSound('undo');
+      },
+
+      undoMove() {
+        if (this.history.length === 0) return;
+        const prevState = this.history.pop();
+        this.boardState = prevState;
+        this.moveCount = Math.max(0, this.moveCount - 1);
+        this.isWon = false;
+        this.closeWinModal();
+        this.updateStats();
+        this.renderBoard();
+        playSound('undo');
+      },
+
+      updateStats() {
+        this.dom.moveCounterDisplay.textContent = this.moveCount;
+        this.dom.btnUndo.disabled = (this.history.length === 0);
+      },
+
+      executeMove(cell, direction) {
+        const nextState = applyMove(this.boardState, cell, direction);
+        if (!nextState) return; // Illegal move
+
+        // Save current state for undo
+        this.history.push([...this.boardState]);
+        this.boardState = nextState;
+        this.moveCount++;
+        this.updateStats();
+        playSound('slide');
+
+        // Check win condition
+        if (isSolved(this.boardState)) {
+          this.isWon = true;
+          this.renderBoard();
+          setTimeout(() => {
+            playSound('win');
+            this.showWinModal();
+          }, 180);
+        } else {
+          this.renderBoard();
+        }
+      },
+
+      renderBoard() {
+        const grid = this.dom.boardGrid;
+        grid.innerHTML = '';
+
+        for (let cell = 0; cell < 16; cell++) {
+          const val = this.boardState[cell];
+          const cellEl = document.createElement('div');
+          cellEl.className = 'cell';
+          cellEl.dataset.index = cell;
+
+          if (val === 0) {
+            // Empty / blank slot
+            const blankEl = document.createElement('div');
+            blankEl.className = 'slot-blank';
+            blankEl.title = `Blank Slot (${cell})`;
+            cellEl.appendChild(blankEl);
+          } else {
+            // Tile
+            const tileEl = document.createElement('div');
+            tileEl.className = 'tile';
+            tileEl.dataset.cell = cell;
+            tileEl.dataset.val = val;
+
+            const numSpan = document.createElement('span');
+            numSpan.className = 'tile-number';
+            numSpan.textContent = val;
+            tileEl.appendChild(numSpan);
+
+            const legalDirs = getLegalDirections(this.boardState, cell);
+
+            // Partner highlight sync
+            if (this.hoveredCell !== null && (cell === this.hoveredCell || cell === getMirrorCell(this.hoveredCell))) {
+              tileEl.classList.add('partner-highlight');
+            }
+
+            if (legalDirs.length === 1) {
+              // Exactly 1 legal move: One-click move
+              tileEl.classList.add('movable');
+              const singleDir = legalDirs[0];
+              tileEl.title = `Click to slide ${singleDir} (mirrored partner will also move)`;
+
+              tileEl.addEventListener('mouseenter', () => {
+                this.hoveredCell = cell;
+                this.refreshHighlights();
+              });
+
+              tileEl.addEventListener('mouseleave', () => {
+                this.hoveredCell = null;
+                this.refreshHighlights();
+              });
+
+              tileEl.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.executeMove(cell, singleDir);
+              });
+
+            } else if (legalDirs.length > 1) {
+              // Dual-blank adjacency: Show two small directional arrows
+              tileEl.classList.add('dual-choice');
+              tileEl.title = `Touches both blanks! Choose an arrow direction.`;
+
+              const arrowsBox = document.createElement('div');
+              arrowsBox.className = 'dual-arrows-container';
+
+              legalDirs.forEach(dir => {
+                const arrowBtn = document.createElement('button');
+                arrowBtn.className = `direction-arrow-btn ${DIRS[dir].className}`;
+                arrowBtn.textContent = DIRS[dir].arrow;
+                arrowBtn.title = `Slide ${dir.toUpperCase()}`;
+
+                arrowBtn.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  this.executeMove(cell, dir);
+                });
+
+                arrowsBox.appendChild(arrowBtn);
+              });
+
+              tileEl.appendChild(arrowsBox);
+
+              tileEl.addEventListener('mouseenter', () => {
+                this.hoveredCell = cell;
+                this.refreshHighlights();
+              });
+
+              tileEl.addEventListener('mouseleave', () => {
+                this.hoveredCell = null;
+                this.refreshHighlights();
+              });
+            }
+
+            cellEl.appendChild(tileEl);
+          }
+
+          grid.appendChild(cellEl);
+        }
+      },
+
+      refreshHighlights() {
+        const tiles = this.dom.boardGrid.querySelectorAll('.tile');
+        tiles.forEach(tile => {
+          const cell = parseInt(tile.dataset.cell, 10);
+          if (this.hoveredCell !== null && (cell === this.hoveredCell || cell === getMirrorCell(this.hoveredCell))) {
+            tile.classList.add('partner-highlight');
+          } else {
+            tile.classList.remove('partner-highlight');
+          }
+        });
+      },
+
+      showWinModal() {
+        const lvl = window.LEVELS[this.currentLevelIndex];
+        this.dom.winLevelName.textContent = lvl.name;
+        this.dom.winMovesCount.textContent = this.moveCount;
+
+        // Hide "Next Level" button if on last level
+        const hasNext = (this.currentLevelIndex + 1 < window.LEVELS.length);
+        this.dom.btnNextLevel.style.display = hasNext ? 'inline-flex' : 'none';
+
+        this.dom.winModal.classList.add('active');
+      },
+
+      closeWinModal() {
+        this.dom.winModal.classList.remove('active');
+      },
+
+      openLevelsModal() {
+        this.renderModalLevels();
+        this.dom.levelsModal.classList.add('active');
+      },
+
+      closeLevelsModal() {
+        this.dom.levelsModal.classList.remove('active');
+      },
+
+      renderStartScreenLevels() {
+        const container = this.dom.startLevelList;
+        container.innerHTML = '';
+        window.LEVELS.forEach((lvl, idx) => {
+          const card = document.createElement('div');
+          card.className = `level-card-btn ${idx === this.currentLevelIndex ? 'current' : ''}`;
+          card.innerHTML = `
+            <div class="level-card-title">${lvl.name}</div>
+            <div class="level-card-hint">${lvl.hint}</div>
+          `;
+          card.addEventListener('click', () => {
+            this.startLevel(idx);
+          });
+          container.appendChild(card);
+        });
+      },
+
+      renderModalLevels() {
+        const container = this.dom.modalLevelList;
+        container.innerHTML = '';
+        window.LEVELS.forEach((lvl, idx) => {
+          const card = document.createElement('div');
+          card.className = `level-card-btn ${idx === this.currentLevelIndex ? 'current' : ''}`;
+          card.innerHTML = `
+            <div class="level-card-title">${lvl.name}</div>
+            <div class="level-card-hint">${lvl.hint}</div>
+          `;
+          card.addEventListener('click', () => {
+            this.closeLevelsModal();
+            this.startLevel(idx);
+          });
+          container.appendChild(card);
+        });
+      }
+    };
+
+    // Initialize game on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      Game.init();
+    });
+  </script>
+</body>
+</html>
