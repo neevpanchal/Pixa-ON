@@ -663,13 +663,13 @@
     <!-- Game Controls: Undo, Restart, Levels -->
     <nav class="game-controls">
       <button id="btn-undo" class="btn" title="Undo Move (Z)">
-        ↶ UNDO (Z)
+        UNDO (Z)
       </button>
-      <button id="btn-restart" class="btn" title="Restart Level">
-        ⟲ RESTART
+      <button id="btn-restart" class="btn" title="Restart Level (R)">
+        RESTART (R)
       </button>
       <button id="btn-open-levels" class="btn" title="Level Select">
-        ☰ LEVELS
+        LEVELS
       </button>
     </nav>
 
@@ -698,10 +698,10 @@
           NEXT LEVEL ▶
         </button>
         <button id="btn-replay-level" class="btn">
-          ⟲ REPLAY LEVEL
+          REPLAY LEVEL
         </button>
         <button id="btn-win-level-select" class="btn">
-          ☰ ALL LEVELS
+          ALL LEVELS
         </button>
       </div>
     </div>
@@ -1037,7 +1037,7 @@
           this.openLevelsModal();
         });
 
-        // Keyboard Shortcut: Key Z for Undo, Key R for Restart
+        // Keyboard Controls: Z for Undo, R for Restart, Arrow keys / WASD for sliding
         window.addEventListener('keydown', (e) => {
           if (this.dom.gameScreen.classList.contains('active')) {
             if (e.key === 'z' || e.key === 'Z') {
@@ -1046,6 +1046,29 @@
             } else if (e.key === 'r' || e.key === 'R') {
               e.preventDefault();
               this.restartLevel();
+            } else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D'].includes(e.key)) {
+              let dir = null;
+              if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') dir = 'up';
+              if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') dir = 'down';
+              if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') dir = 'left';
+              if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') dir = 'right';
+
+              if (dir) {
+                // If a cell is hovered, try to move it
+                if (this.hoveredCell !== null && getLegalDirections(this.boardState, this.hoveredCell).includes(dir)) {
+                  e.preventDefault();
+                  this.executeMove(this.hoveredCell, dir);
+                } else {
+                  // Find any tile that can legally move in this direction
+                  for (let c = 0; c < 16; c++) {
+                    if (getLegalDirections(this.boardState, c).includes(dir)) {
+                      e.preventDefault();
+                      this.executeMove(c, dir);
+                      break;
+                    }
+                  }
+                }
+              }
             }
           }
         });
@@ -1233,6 +1256,25 @@
               tileEl.addEventListener('mouseleave', () => {
                 this.hoveredCell = null;
                 this.refreshHighlights();
+              });
+
+              // Allow clicking anywhere on the tile body: slides in the direction closest to the click
+              tileEl.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const rect = tileEl.getBoundingClientRect();
+                const normX = (e.clientX - rect.left) / rect.width - 0.5;
+                const normY = (e.clientY - rect.top) / rect.height - 0.5;
+                let bestDir = legalDirs[0];
+                let bestDot = -Infinity;
+                for (const d of legalDirs) {
+                  const dObj = DIRS[d];
+                  const dot = normY * dObj.dr + normX * dObj.dc;
+                  if (dot > bestDot) {
+                    bestDot = dot;
+                    bestDir = d;
+                  }
+                }
+                this.executeMove(cell, bestDir);
               });
             }
 
