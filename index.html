@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Mirror Slide - Mirrored Sliding Tile Puzzle</title>
+  <title>MIRROR SLIDE // OPTICAL_CORE</title>
   
   <!-- Retro Pixel Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,25 +12,38 @@
 
   <style>
     /* ==========================================================================
-       THEME & DESIGN SYSTEM (NO GRADIENTS, HARD OFFSET SHADOWS, RETRO PIXEL LOOK)
+       OPTICAL CORE DESIGN SYSTEM (DARK CARBON, AMBER & COBALT HUD, STRICTLY ZERO GRADIENTS)
        ========================================================================== */
     :root {
-      --bg-cream: #FAF6ED;
-      --board-bg: #F1EAD8;
-      --tile-bg: #FFFDF9;
-      --tile-hover: #FFF8E7;
-      --navy: #0D1F3C;
-      --navy-light: #233C63;
-      --gold: #F59E0B;
-      --gold-dark: #D97706;
-      --gold-light: #FEF3C7;
-      --slot-empty: #E5DEC9;
-      --border-width: 3px;
+      --bg-deep: #0D0C0A;
+      --bg-panel: #16140F;
+      --bg-panel-dark: #100F0C;
+      --bg-panel-border: #332B1E;
+      --bg-panel-border-bright: #52442F;
+
+      --amber: #F59E0B;
+      --amber-dark: #D97706;
+      --amber-dim: #78350F;
+      --amber-light: #FEF3C7;
+      --amber-glow: rgba(245, 158, 11, 0.45);
+
+      --blue-sector: #3B82F6;
+      --blue-dark: #1D4ED8;
+      --blue-light: #DBEAFE;
+      --blue-glow: rgba(59, 130, 246, 0.45);
+
+      --tile-bg: #EFEAD9;
+      --tile-hover: #FFFBEB;
+      --tile-text: #0D1424;
+      --socket-bg: #13120E;
+
+      --text-primary: #E6DFD3;
+      --text-muted: #8E8370;
+      --text-dim: #544E42;
+      --text-dark: #0D0C0A;
+
+      --border-width: 2px;
       --board-gap: 8px;
-      --shadow-sm: 2px 2px 0px var(--navy);
-      --shadow-md: 4px 4px 0px var(--navy);
-      --shadow-lg: 6px 6px 0px var(--navy);
-      --shadow-xl: 8px 8px 0px var(--navy);
     }
 
     * {
@@ -44,298 +57,616 @@
 
     body {
       font-family: 'Press Start 2P', 'Courier New', monospace;
-      color: var(--navy);
-      background-color: var(--bg-cream);
-      /* Crisp graph-paper background pattern using pure SVG strokes (STRICTLY NO GRADIENTS) */
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M 24 0 L 0 0 0 24' fill='none' stroke='%23DCD3C0' stroke-width='1'/%3E%3C/svg%3E");
+      color: var(--text-primary);
+      background-color: var(--bg-deep);
+      /* Crisp optical graph grid (zero CSS gradients, pure SVG strokes) */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M 28 0 L 0 0 0 28' fill='none' stroke='%23211C14' stroke-width='1'/%3E%3C/svg%3E");
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 14px 10px;
+      justify-content: flex-start;
+      padding: 10px 8px;
       line-height: 1.5;
       overflow-x: hidden;
+    }
+
+    /* Top Master Terminal Bar */
+    .terminal-top-bar {
+      width: 100%;
+      max-width: 1080px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 12px;
+      background-color: var(--bg-panel-dark);
+      border: 2px solid var(--bg-panel-border);
+      font-size: 8px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .terminal-top-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .terminal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--amber);
+      font-weight: bold;
+    }
+
+    .btn-audio-toggle {
+      background: none;
+      border: 1px solid var(--bg-panel-border-bright);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 8px;
+      padding: 4px 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-audio-toggle:hover {
+      background-color: var(--bg-panel-border);
+      color: var(--amber);
+    }
+
+    /* Bottom Master Terminal Bar */
+    .terminal-bottom-bar {
+      width: 100%;
+      max-width: 1080px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 12px;
+      background-color: var(--bg-panel-dark);
+      border: 2px solid var(--bg-panel-border);
+      font-size: 7.5px;
+      color: var(--text-muted);
+      margin-top: 14px;
     }
 
     /* Screen containers */
     .screen {
       display: none;
       width: 100%;
-      max-width: 480px;
+      max-width: 1080px;
       flex-direction: column;
       align-items: center;
-      text-align: center;
     }
 
     .screen.active {
       display: flex;
     }
 
-    /* Chunky Pixel Buttons */
+    /* Chunky Pixel HUD Buttons */
     .btn {
       font-family: 'Press Start 2P', 'Courier New', monospace;
-      font-size: 10px;
-      color: var(--navy);
-      background-color: var(--tile-bg);
-      border: var(--border-width) solid var(--navy);
-      box-shadow: var(--shadow-md);
-      padding: 10px 14px;
+      font-size: 9px;
+      color: var(--text-primary);
+      background-color: var(--bg-panel);
+      border: 2px solid var(--bg-panel-border-bright);
+      padding: 9px 12px;
       cursor: pointer;
       text-transform: uppercase;
       outline: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      transition: transform 0.05s ease, box-shadow 0.05s ease;
+      gap: 8px;
+      transition: transform 0.05s ease, background-color 0.05s ease, border-color 0.05s ease;
       touch-action: manipulation;
     }
 
     .btn:hover {
-      background-color: var(--tile-hover);
+      background-color: var(--bg-panel-border);
+      border-color: var(--amber);
+      color: #FFF;
       transform: translate(-1px, -1px);
-      box-shadow: 5px 5px 0px var(--navy);
     }
 
     .btn:active {
-      transform: translate(2px, 2px);
-      box-shadow: 2px 2px 0px var(--navy);
+      transform: translate(1px, 1px);
     }
 
-    .btn:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: var(--shadow-sm);
+    .btn-amber {
+      background-color: var(--amber);
+      color: var(--text-dark);
+      border-color: var(--amber-dark);
+      font-weight: bold;
     }
 
-    .btn-gold {
-      background-color: var(--gold);
-      color: var(--navy);
-    }
-
-    .btn-gold:hover {
+    .btn-amber:hover {
       background-color: #FBBF24;
+      color: var(--text-dark);
+      border-color: #F59E0B;
     }
 
-    .btn-lg {
-      font-size: 12px;
-      padding: 14px 20px;
-      box-shadow: var(--shadow-lg);
+    .btn-blue {
+      background-color: #263C68;
+      color: #FFF;
+      border-color: #3B5998;
     }
 
-    .btn-lg:hover {
-      box-shadow: 7px 7px 0px var(--navy);
+    .btn-blue:hover {
+      background-color: #324F88;
+      border-color: var(--blue-sector);
     }
 
-    /* Title & Headers */
-    .game-logo {
-      font-size: 26px;
-      letter-spacing: -1px;
+    /* Technical Corner Brackets */
+    .reticle-box {
+      position: relative;
+    }
+
+    .reticle-box::before,
+    .reticle-box::after {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      pointer-events: none;
+      border-color: var(--amber);
+      border-style: solid;
+      z-index: 10;
+    }
+
+    .reticle-box::before {
+      top: -2px;
+      left: -2px;
+      border-width: 2px 0 0 2px;
+    }
+
+    .reticle-box::after {
+      bottom: -2px;
+      right: -2px;
+      border-width: 0 2px 2px 0;
+    }
+
+    /* ==========================================================================
+       SCREEN 1: TITLE SCREEN (MATCHING IMAGE 3)
+       ========================================================================== */
+    .title-screen-container {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin: auto 0;
+      padding: 16px 8px;
+    }
+
+    .title-meta-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      font-size: 8px;
+    }
+
+    .title-cartridge-tag {
+      background-color: var(--bg-panel);
+      border: 2px solid var(--bg-panel-border);
+      padding: 6px 12px;
+      color: var(--amber);
+    }
+
+    .title-sound-tag {
+      background-color: #1A2742;
+      border: 1px solid var(--blue-sector);
+      color: #93C5FD;
+      padding: 6px 12px;
+      font-size: 7.5px;
+    }
+
+    .title-logo-block {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .title-pre-heading {
+      font-size: 8.5px;
+      letter-spacing: 2px;
+      color: var(--amber);
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+
+    .title-word-mirror {
+      font-size: 42px;
+      letter-spacing: 2px;
+      color: #E6DFD3;
       margin-bottom: 6px;
-      text-transform: uppercase;
+    }
+
+    .title-word-slide {
+      font-size: 42px;
+      letter-spacing: 2px;
+      color: var(--amber);
+      margin-bottom: 6px;
+    }
+
+    .title-beam-divider {
+      width: 100%;
+      max-width: 480px;
+      height: 3px;
+      background-color: #38BDF8;
+      box-shadow: 0 0 10px #38BDF8;
+      margin: 6px auto;
+      position: relative;
+    }
+
+    .title-beam-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 7px;
+      background-color: var(--amber);
+      border: 1px solid #FFF;
+    }
+
+    .title-word-slide-reflected {
+      font-size: 42px;
+      letter-spacing: 2px;
+      color: #333C4D;
+      transform: scaleY(-1);
+      margin-top: 4px;
+      opacity: 0.85;
+    }
+
+    .title-subtitle-card {
+      background-color: var(--bg-panel);
+      border: 2px solid var(--bg-panel-border-bright);
+      padding: 14px 20px;
+      margin: 18px 0 24px 0;
+      font-size: 9px;
+      line-height: 1.8;
+      color: var(--text-primary);
+      max-width: 620px;
+    }
+
+    .title-subtitle-card .highlight {
+      color: var(--amber);
+      font-weight: bold;
+    }
+
+    .title-menu-layout {
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 16px;
+      width: 100%;
+      max-width: 680px;
+      margin-bottom: 24px;
+    }
+
+    .deco-sensor-card {
+      background-color: var(--bg-panel);
+      border: 2px solid var(--bg-panel-border);
+      padding: 12px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 120px;
+      font-size: 7px;
+      color: var(--text-muted);
+    }
+
+    .deco-sensor-icon {
+      width: 44px;
+      height: 44px;
+      background-color: #20355D;
+      border: 1px solid var(--blue-sector);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #93C5FD;
+    }
+
+    .title-buttons-column {
+      display: flex;
+      flex-direction: column;
       gap: 10px;
+      flex: 1;
+      max-width: 380px;
     }
 
-    .gold-accent-text {
-      color: var(--gold-dark);
-      text-shadow: 2px 2px 0px var(--navy);
+    .btn-menu-action {
+      width: 100%;
+      padding: 13px 14px;
+      font-size: 9.5px;
+      justify-content: space-between;
     }
 
-    /* Required exact description text */
-    .subtitle-card {
-      background-color: var(--tile-bg);
-      border: var(--border-width) solid var(--navy);
-      box-shadow: var(--shadow-md);
-      padding: 14px 16px;
-      margin: 12px 0 16px 0;
-      font-size: 10px;
+    .title-credits {
+      font-size: 8px;
+      color: var(--text-dim);
       line-height: 1.8;
-      text-align: center;
-      width: 100%;
+      margin-top: 10px;
     }
 
-    .menu-box {
+    /* ==========================================================================
+       SCREEN 2: IN-GAME SCREEN (MATCHING IMAGE 1)
+       ========================================================================== */
+    .game-screen-layout {
       width: 100%;
-      background-color: var(--board-bg);
-      border: 4px solid var(--navy);
-      box-shadow: var(--shadow-lg);
-      padding: 18px 16px;
-      margin-bottom: 14px;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .menu-actions-row {
+    .game-hud-top-bar {
       display: flex;
-      gap: 10px;
-      width: 100%;
-    }
-
-    .menu-actions-row .btn {
-      flex: 1;
-    }
-
-    .level-select-grid {
-      display: grid;
-      grid-template-columns: 1fr;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 8px;
       width: 100%;
     }
 
-    .level-card-btn {
-      width: 100%;
-      text-align: left;
-      padding: 10px 12px;
+    .game-hud-top-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .game-hud-top-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .metric-chip {
+      background-color: var(--bg-panel);
+      border: 2px solid var(--bg-panel-border);
+      padding: 5px 10px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
-      background-color: var(--tile-bg);
-      border: var(--border-width) solid var(--navy);
-      box-shadow: var(--shadow-sm);
-      cursor: pointer;
-    }
-
-    .level-card-btn:hover {
-      background-color: var(--gold-light);
-      transform: translate(-1px, -1px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .level-card-btn.current {
-      border: 3px solid var(--gold-dark);
-      background-color: #FFFBEB;
-    }
-
-    .level-card-header {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      gap: 3px;
+      min-width: 64px;
+    }
+
+    .metric-chip-label {
+      font-size: 7px;
+      color: var(--text-muted);
+    }
+
+    .metric-chip-value {
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--text-primary);
+    }
+
+    .metric-chip-value.gold {
+      color: var(--amber);
+    }
+
+    .game-main-columns {
+      display: flex;
+      gap: 18px;
       width: 100%;
-    }
-
-    .level-card-title {
-      font-size: 10px;
-      font-weight: bold;
-      color: var(--navy);
-    }
-
-    .level-card-par {
-      font-size: 8px;
-      background-color: var(--gold-light);
-      color: var(--gold-dark);
-      border: 1px solid var(--navy);
-      padding: 2px 5px;
-      font-weight: bold;
-      white-space: nowrap;
-    }
-
-    .level-card-hint {
-      font-size: 8px;
-      line-height: 1.4;
-      color: var(--navy-light);
-    }
-
-    /* Gameplay Header */
-    .game-header {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .level-badge {
-      font-size: 10px;
-      background-color: var(--tile-bg);
-      border: 2px solid var(--navy);
-      box-shadow: var(--shadow-sm);
-      padding: 6px 10px;
-      font-weight: bold;
-      white-space: nowrap;
-    }
-
-    .sound-toggle-btn {
-      padding: 6px 10px;
-      font-size: 9px;
-      min-width: 72px;
-    }
-
-    .stats-bar {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: var(--tile-bg);
-      border: var(--border-width) solid var(--navy);
-      box-shadow: var(--shadow-sm);
-      padding: 8px 12px;
-      margin-bottom: 10px;
-      font-size: 10.5px;
-    }
-
-    .stat-moves {
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .stat-moves span {
-      color: var(--gold-dark);
-    }
-
-    .stat-par {
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 9.5px;
-    }
-
-    .stat-par span {
-      color: var(--gold-dark);
-    }
-
-    /* Hint Alert Banner */
-    .hint-banner {
-      width: 100%;
-      background-color: var(--gold-light);
-      border: 2px dashed var(--navy);
-      box-shadow: var(--shadow-sm);
-      padding: 8px 10px;
-      font-size: 8.5px;
-      line-height: 1.5;
-      margin-bottom: 12px;
-      text-align: left;
-      display: flex;
       align-items: flex-start;
+      justify-content: center;
+    }
+
+    /* Left Telemetry Widgets Column */
+    .game-telemetry-col {
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .hud-panel {
+      background-color: var(--bg-panel);
+      border: 2px solid var(--bg-panel-border);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hud-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 8px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--bg-panel-border);
+      padding-bottom: 6px;
+    }
+
+    .hud-panel-title {
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
       gap: 6px;
     }
 
-    .hint-banner .hint-icon {
-      font-size: 10px;
+    .hud-panel-body {
+      font-size: 8px;
+      line-height: 1.7;
+      color: var(--text-muted);
     }
 
-    /* 4x4 Puzzle Board */
+    .hud-panel-body .sector-alpha {
+      color: var(--amber);
+      font-weight: bold;
+    }
+
+    .hud-panel-body .sector-beta {
+      color: var(--blue-sector);
+      font-weight: bold;
+    }
+
+    .hud-tags-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .hud-tag {
+      background-color: var(--bg-panel-dark);
+      border: 1px solid var(--bg-panel-border-bright);
+      padding: 4px 6px;
+      font-size: 7px;
+      color: var(--text-primary);
+      flex: 1;
+      text-align: center;
+    }
+
+    /* Mini Target Schematic Matrix */
+    .schematic-matrix-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+    }
+
+    .mini-schematic-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 28px);
+      grid-template-rows: repeat(4, 28px);
+      gap: 3px;
+      background-color: var(--bg-panel-dark);
+      padding: 6px;
+      border: 1px solid var(--bg-panel-border);
+      position: relative;
+    }
+
+    .mini-schematic-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 7px;
+      font-weight: bold;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .mini-schematic-cell.alpha {
+      background-color: rgba(245, 158, 11, 0.25);
+      color: var(--amber);
+    }
+
+    .mini-schematic-cell.beta {
+      background-color: rgba(59, 130, 246, 0.25);
+      color: #93C5FD;
+    }
+
+    .mini-schematic-cell.socket {
+      background-color: #0E0D0A;
+      color: var(--text-dim);
+    }
+
+    .mini-schematic-axis-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: linear-gradient(to top right, transparent calc(50% - 1px), var(--amber) 50%, transparent calc(50% + 1px));
+      opacity: 0.6;
+    }
+
+    /* Linked Pair Target Status */
+    .linked-pair-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background-color: var(--bg-panel-dark);
+      border: 1px solid var(--bg-panel-border);
+      font-size: 8px;
+    }
+
+    .linked-pair-tag {
+      background-color: rgba(245, 158, 11, 0.2);
+      border: 1px solid var(--amber);
+      color: var(--amber);
+      padding: 2px 6px;
+      font-size: 7px;
+      font-weight: bold;
+    }
+
+    /* Right Puzzle Grid Column */
+    .game-grid-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      max-width: 480px;
+      width: 100%;
+    }
+
+    .chamber-header-card {
+      width: 100%;
+      background-color: var(--bg-panel);
+      border: 2px solid var(--bg-panel-border);
+      padding: 10px 14px;
+      text-align: center;
+    }
+
+    .chamber-title-text {
+      font-size: 11.5px;
+      color: var(--amber);
+      margin-bottom: 5px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+
+    .chamber-sub-text {
+      font-size: 7.5px;
+      color: var(--text-muted);
+    }
+
+    /* 4x4 Reflector Core Grid Frame */
     .board-frame {
-      background-color: var(--board-bg);
-      border: 4px solid var(--navy);
-      box-shadow: var(--shadow-xl);
+      background-color: var(--bg-panel);
+      border: 3px solid var(--bg-panel-border-bright);
       padding: 12px;
       width: 100%;
-      max-width: 440px;
       aspect-ratio: 1 / 1;
       display: flex;
       flex-direction: column;
       position: relative;
+    }
+
+    .grid-status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 7.5px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .grid-status-header .core-title {
+      color: var(--amber);
+      font-weight: bold;
+    }
+
+    .board-grid-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      flex: 1;
     }
 
     .board-grid {
@@ -345,9 +676,41 @@
       gap: var(--board-gap);
       width: 100%;
       height: 100%;
+      position: relative;
+      z-index: 2;
     }
 
-    /* Cells */
+    /* 45° Diagonal Mirror Axis Line & Badge */
+    .mirror-axis-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mirror-axis-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .mirror-axis-badge {
+      background-color: rgba(13, 12, 10, 0.92);
+      border: 1px solid var(--amber-dark);
+      color: var(--amber);
+      font-size: 6.5px;
+      padding: 3px 6px;
+      white-space: nowrap;
+      transform: rotate(-45deg);
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+      letter-spacing: 0.5px;
+    }
+
+    /* Grid Cells */
     .cell {
       position: relative;
       width: 100%;
@@ -357,52 +720,48 @@
       justify-content: center;
     }
 
-    /* Empty / Blank Slot */
+    /* Empty Socket Slots (0 Alpha & 0 Beta) */
     .slot-blank {
       width: 100%;
       height: 100%;
-      background-color: var(--slot-empty);
-      border: 2px dashed var(--navy);
+      background-color: var(--socket-bg);
+      border: 2px dashed var(--bg-panel-border-bright);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      opacity: 0.85;
+      gap: 4px;
+      font-size: 6px;
+      color: var(--text-dim);
       box-sizing: border-box;
+      line-height: 1.3;
+      text-align: center;
     }
 
-    .slot-blank::after {
-      content: '◫';
-      font-size: 14px;
-      color: var(--navy);
-      opacity: 0.35;
+    .slot-blank .socket-reticle {
+      font-size: 11px;
+      color: var(--amber);
+      opacity: 0.6;
     }
 
-    /* Target Solved Blank Markers at cells 0 and 15 */
-    .cell[data-index="0"] .slot-blank::after,
-    .cell[data-index="15"] .slot-blank::after {
-      content: '★';
-      font-size: 13px;
-      color: var(--gold-dark);
-      opacity: 0.65;
-    }
-
-    /* Tile Element */
+    /* Tile Elements */
     .tile {
       width: 100%;
       height: 100%;
       background-color: var(--tile-bg);
-      border: var(--border-width) solid var(--navy);
-      box-shadow: var(--shadow-sm);
+      border: 2px solid #0D0C0A;
+      box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.7);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
-      color: var(--navy);
+      color: var(--tile-text);
       cursor: default;
       position: relative;
       touch-action: manipulation;
-      transition: transform 120ms cubic-bezier(0.2, 0, 0.2, 1), box-shadow 120ms ease;
+      transition: transform 120ms cubic-bezier(0.2, 0, 0.2, 1), box-shadow 120ms ease, background-color 120ms ease;
     }
 
     .tile-number {
@@ -410,36 +769,47 @@
       z-index: 1;
     }
 
-    /* Movable Tiles (1 adjacent blank) */
     .tile.movable {
       cursor: pointer;
     }
 
     .tile.movable:hover,
     .tile.hover-active {
-      background-color: var(--tile-hover);
-      border-color: var(--navy);
+      background-color: var(--amber) !important;
+      color: #0D0C0A !important;
+      border-color: #0D0C0A !important;
       transform: translate(-2px, -2px);
-      box-shadow: var(--shadow-md);
+      box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.9);
     }
 
-    /* ==========================================================================
-       SUBTLE GHOST HIGHLIGHT ON MIRRORED TILE (SO PLAYER SEES THE TWIST)
-       ========================================================================== */
+    /* Partner Ghost / Mirrored Twin Highlight (Sector Beta / Blue) */
     .tile.partner-ghost {
-      border: 3px dashed var(--gold-dark) !important;
-      background-color: #FEF3C7 !important;
-      box-shadow: 0 0 10px rgba(217, 119, 6, 0.6), var(--shadow-sm) !important;
+      background-color: var(--blue-sector) !important;
+      color: #FFFFFF !important;
+      border: 2px dashed #93C5FD !important;
+      box-shadow: 0 0 12px var(--blue-glow), 2px 2px 0px rgba(0, 0, 0, 0.8) !important;
       animation: ghostPulse 1.2s infinite ease-in-out;
     }
 
     .tile.partner-ghost::after {
-      content: 'MIRROR';
+      content: 'BETA';
       position: absolute;
-      bottom: 2px;
-      right: 3px;
-      font-size: 6px;
-      color: var(--gold-dark);
+      top: 3px;
+      left: 3px;
+      font-size: 5.5px;
+      color: #DBEAFE;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+    }
+
+    .tile.hover-active::after {
+      content: 'ALPHA';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      font-size: 5.5px;
+      color: #78350F;
       font-weight: bold;
       letter-spacing: 0.5px;
       pointer-events: none;
@@ -447,16 +817,14 @@
 
     @keyframes ghostPulse {
       0%, 100% {
-        box-shadow: 0 0 6px rgba(217, 119, 6, 0.4), var(--shadow-sm);
+        box-shadow: 0 0 6px var(--blue-glow), 2px 2px 0px rgba(0, 0, 0, 0.8);
       }
       50% {
-        box-shadow: 0 0 12px rgba(217, 119, 6, 0.8), var(--shadow-sm);
+        box-shadow: 0 0 14px var(--blue-glow), 2px 2px 0px rgba(0, 0, 0, 0.8);
       }
     }
 
-    /* ==========================================================================
-       SMOOTH TILE SLIDE ANIMATION (~120ms) & GHOST SLIDE
-       ========================================================================== */
+    /* Sliding Animations (120ms) */
     .tile.sliding-up {
       transform: translateY(calc(-100% - var(--board-gap, 8px))) !important;
       z-index: 10;
@@ -474,17 +842,14 @@
       z-index: 10;
     }
 
-    /* Ghost highlight while the mirrored tile is sliding */
     .tile.ghost-slide {
-      border-style: dashed !important;
-      border-color: var(--gold-dark) !important;
-      background-color: #FEF3C7 !important;
-      box-shadow: 0 0 14px rgba(245, 158, 11, 0.75), var(--shadow-sm) !important;
+      background-color: var(--blue-sector) !important;
+      color: #FFFFFF !important;
+      border: 2px dashed #93C5FD !important;
+      box-shadow: 0 0 14px var(--blue-glow) !important;
     }
 
-    /* ==========================================================================
-       BUMP SHAKE ANIMATION FOR ILLEGAL MOVES
-       ========================================================================== */
+    /* Illegal Move Bump Shake */
     @keyframes tileBump {
       0%, 100% { transform: translate(0, 0); }
       20% { transform: translate(-4px, 0); }
@@ -495,22 +860,12 @@
 
     .tile.tile-bump {
       animation: tileBump 0.2s ease-in-out;
-      border-color: #DC2626 !important;
-      box-shadow: 0 0 6px rgba(220, 38, 38, 0.6), var(--shadow-sm) !important;
+      border-color: #EF4444 !important;
+      background-color: #F87171 !important;
+      color: #FFF !important;
     }
 
-    /* Dual-Direction Tile (adjacent to both blanks) */
-    .tile.dual-choice {
-      border: 3px solid var(--gold-dark);
-      background-color: #FFFBEB;
-    }
-
-    .tile.dual-choice .tile-number {
-      font-size: 15px;
-      opacity: 0.85;
-    }
-
-    /* Arrow Selector Buttons on Dual-Blank Tiles */
+    /* Dual Arrow Choice Buttons */
     .dual-arrows-container {
       position: absolute;
       inset: 0;
@@ -520,13 +875,13 @@
     .direction-arrow-btn {
       position: absolute;
       pointer-events: auto;
-      background-color: var(--gold);
-      color: var(--navy);
-      border: 2px solid var(--navy);
-      box-shadow: 1px 1px 0px var(--navy);
-      width: 24px;
-      height: 24px;
-      font-size: 11px;
+      background-color: var(--amber);
+      color: #0D0C0A;
+      border: 1px solid #0D0C0A;
+      box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+      width: 22px;
+      height: 22px;
+      font-size: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -535,76 +890,295 @@
       transition: transform 0.05s ease, background-color 0.05s ease;
     }
 
-    .direction-arrow-btn.arrow-up {
-      top: 3px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
+    .direction-arrow-btn.arrow-up { top: 2px; left: 50%; transform: translateX(-50%); }
+    .direction-arrow-btn.arrow-down { bottom: 2px; left: 50%; transform: translateX(-50%); }
+    .direction-arrow-btn.arrow-left { left: 2px; top: 50%; transform: translateY(-50%); }
+    .direction-arrow-btn.arrow-right { right: 2px; top: 50%; transform: translateY(-50%); }
 
-    .direction-arrow-btn.arrow-down {
-      bottom: 3px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
+    .direction-arrow-btn:hover { background-color: #FDE047; }
 
-    .direction-arrow-btn.arrow-left {
-      left: 3px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    .direction-arrow-btn.arrow-right {
-      right: 3px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    .direction-arrow-btn:hover {
-      background-color: #FEF08A;
-    }
-
-    .direction-arrow-btn.arrow-up:hover { transform: translateX(-50%) scale(1.15); }
-    .direction-arrow-btn.arrow-down:hover { transform: translateX(-50%) scale(1.15); }
-    .direction-arrow-btn.arrow-left:hover { transform: translateY(-50%) scale(1.15); }
-    .direction-arrow-btn.arrow-right:hover { transform: translateY(-50%) scale(1.15); }
-
-    .direction-arrow-btn:active {
-      box-shadow: 0px 0px 0px var(--navy);
-    }
-
-    /* Controls Bar */
-    .game-controls {
+    /* Grid Frame Footer */
+    .grid-status-footer {
       display: flex;
-      gap: 8px;
-      width: 100%;
-      margin-top: 14px;
       justify-content: space-between;
+      align-items: center;
+      font-size: 7px;
+      color: var(--text-dim);
+      margin-top: 10px;
     }
 
-    .game-controls .btn {
+    /* Action Controls Bar */
+    .game-actions-bar {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .game-actions-bar .btn {
       flex: 1;
-      padding: 10px 4px;
-      font-size: 9px;
+      padding: 11px 8px;
     }
 
-    /* Instruction Footnote */
-    .rules-footnote {
-      margin-top: 12px;
+    /* ==========================================================================
+       SCREEN 3: CHAMBER SELECT SCREEN (MATCHING IMAGE 4)
+       ========================================================================== */
+    .chamber-select-layout {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .chamber-select-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .sector-clearance-bar-box {
+      background-color: var(--bg-panel);
+      border: 2px solid var(--bg-panel-border);
+      padding: 6px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 170px;
+    }
+
+    .sector-clearance-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 7px;
+      color: var(--text-muted);
+    }
+
+    .sector-progress-track {
+      width: 100%;
+      height: 6px;
+      background-color: var(--bg-panel-dark);
+      border: 1px solid var(--bg-panel-border);
+      overflow: hidden;
+    }
+
+    .sector-progress-fill {
+      height: 100%;
+      background-color: var(--amber);
+      width: 25%;
+    }
+
+    .chamber-headline-box {
+      width: 100%;
+      background-color: var(--bg-panel);
+      border: 2px solid var(--bg-panel-border);
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    .chamber-headline-sub {
+      font-size: 7.5px;
+      color: var(--amber);
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .chamber-headline-title {
+      font-size: 16px;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .chamber-headline-desc {
       font-size: 8px;
-      color: var(--navy-light);
-      line-height: 1.5;
-      text-align: center;
+      color: var(--text-muted);
+      line-height: 1.6;
     }
 
-    /* Modals & Overlays (Win Screen, How to Play, Level Select) */
+    /* Chamber Cards Grid */
+    .chambers-deck {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      width: 100%;
+    }
+
+    .chamber-card {
+      background-color: var(--bg-panel);
+      border: 2px solid var(--bg-panel-border);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.05s ease, border-color 0.05s ease;
+    }
+
+    .chamber-card:hover {
+      border-color: var(--bg-panel-border-bright);
+      transform: translateY(-2px);
+    }
+
+    .chamber-card.active-chamber {
+      border: 2px solid var(--amber) !important;
+      background-color: #1A1710;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+    }
+
+    .chamber-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 7px;
+      color: var(--text-muted);
+    }
+
+    .chamber-card-badge {
+      background-color: var(--amber);
+      color: var(--text-dark);
+      padding: 2px 4px;
+      font-size: 6.5px;
+      font-weight: bold;
+    }
+
+    .chamber-card-num {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--text-primary);
+    }
+
+    .chamber-card.active-chamber .chamber-card-num {
+      color: var(--amber);
+    }
+
+    .chamber-card-name {
+      font-size: 8.5px;
+      font-weight: bold;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+
+    .chamber-card-spec {
+      font-size: 6.5px;
+      color: var(--text-muted);
+    }
+
+    .chamber-card-preview {
+      width: 100%;
+      height: 64px;
+      background-color: var(--bg-panel-dark);
+      border: 1px solid var(--bg-panel-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .preview-schematic-svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    .chamber-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 7px;
+      color: var(--amber);
+      margin-top: 4px;
+    }
+
+    /* Active Chamber Briefing Box */
+    .active-briefing-panel {
+      width: 100%;
+      background-color: var(--bg-panel);
+      border: 2px solid var(--bg-panel-border);
+      padding: 14px 16px;
+      display: flex;
+      gap: 16px;
+      align-items: stretch;
+      margin-top: 6px;
+    }
+
+    .briefing-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .briefing-header {
+      font-size: 8px;
+      color: var(--amber);
+    }
+
+    .briefing-title {
+      font-size: 11px;
+      color: var(--text-primary);
+      font-weight: bold;
+    }
+
+    .briefing-text {
+      font-size: 8px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .briefing-tags {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .briefing-tag {
+      background-color: var(--bg-panel-dark);
+      border: 1px solid var(--bg-panel-border);
+      padding: 4px 8px;
+      font-size: 7px;
+      color: var(--amber);
+    }
+
+    .briefing-hotkeys {
+      width: 220px;
+      background-color: var(--bg-panel-dark);
+      border: 1px solid var(--bg-panel-border);
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 7px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .hotkey-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hotkey-badge {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--bg-panel-border-bright);
+      color: var(--text-primary);
+      padding: 2px 4px;
+    }
+
+    /* ==========================================================================
+       MODAL 1: HOW TO PLAY / MANUAL (MATCHING IMAGE 2)
+       ========================================================================== */
     .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background-color: rgba(13, 31, 60, 0.78);
+      background-color: rgba(9, 8, 7, 0.88);
       align-items: center;
       justify-content: center;
-      padding: 14px;
+      padding: 12px;
       z-index: 100;
       overflow-y: auto;
     }
@@ -613,506 +1187,702 @@
       display: flex;
     }
 
-    .modal-card {
-      background-color: var(--bg-cream);
-      border: 4px solid var(--navy);
-      box-shadow: var(--shadow-xl);
-      padding: 22px 18px;
-      max-width: 440px;
+    .manual-modal-card {
+      background-color: var(--bg-panel);
+      border: 3px solid var(--bg-panel-border-bright);
+      padding: 20px;
+      max-width: 660px;
       width: 100%;
-      text-align: center;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
+      position: relative;
       animation: modalPop 0.12s ease-out;
-      max-height: 92vh;
-      overflow-y: auto;
     }
 
     @keyframes modalPop {
-      0% { transform: scale(0.92); opacity: 0; }
+      0% { transform: scale(0.95); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
 
-    .win-title {
-      font-size: 15px;
-      color: var(--navy);
+    .manual-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--bg-panel-border);
+      padding-bottom: 10px;
+    }
+
+    .manual-modal-title {
+      font-size: 11px;
+      color: var(--amber);
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 8px;
     }
 
-    .win-moves-summary {
-      font-size: 10.5px;
-      background-color: var(--tile-bg);
-      border: var(--border-width) solid var(--navy);
-      box-shadow: var(--shadow-sm);
-      padding: 14px 12px;
-      line-height: 1.6;
+    .manual-steps-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
     }
 
-    .win-score-box {
+    .manual-step-panel {
+      background-color: var(--bg-panel-dark);
+      border: 1px solid var(--bg-panel-border);
+      padding: 12px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .step-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 7.5px;
+      color: var(--amber);
+      border-bottom: 1px solid var(--bg-panel-border);
+      padding-bottom: 4px;
+    }
+
+    .step-panel-tag {
+      font-size: 6.5px;
+      color: var(--text-muted);
+    }
+
+    .step-diagram-box {
+      width: 100%;
+      height: 72px;
+      background-color: var(--bg-deep);
+      border: 1px solid var(--bg-panel-border);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      margin: 8px 0;
+      position: relative;
     }
 
-    .score-pill {
-      background-color: var(--board-bg);
-      border: 2px solid var(--navy);
-      padding: 6px 12px;
+    .step-title {
+      font-size: 8.5px;
+      font-weight: bold;
+      color: var(--text-primary);
+    }
+
+    .step-desc {
+      font-size: 7.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .manual-commence-btn {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 11px;
+    }
+
+    .manual-dismiss-note {
+      font-size: 7px;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    /* ==========================================================================
+       MODAL 2: CHAMBER CLEAR / WIN SCREEN
+       ========================================================================== */
+    .win-modal-card {
+      background-color: var(--bg-panel);
+      border: 3px solid var(--amber);
+      padding: 24px 20px;
+      max-width: 480px;
+      width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 2px;
-      min-width: 80px;
+      gap: 16px;
+      text-align: center;
+      position: relative;
+      animation: modalPop 0.12s ease-out;
     }
 
-    .score-label {
-      font-size: 8px;
-      color: var(--navy-light);
-      font-weight: bold;
-    }
-
-    .score-val {
-      font-size: 14px;
-      font-weight: bold;
-      color: var(--navy);
-    }
-
-    .score-divider {
-      font-size: 10px;
-      font-weight: bold;
-      color: var(--navy-light);
-    }
-
-    .win-one-liner {
-      margin-top: 10px;
-      font-size: 9px;
-      font-weight: bold;
-      color: var(--navy);
-      padding: 8px 6px;
-      background-color: var(--gold-light);
-      border: 2px dashed var(--navy);
+    .win-header-title {
+      font-size: 12px;
+      color: var(--amber);
       line-height: 1.5;
     }
 
-    .modal-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      width: 100%;
-      margin-top: 4px;
-    }
-
-    /* ==========================================================================
-       HOW TO PLAY OVERLAY ANIMATED EXAMPLE
-       ========================================================================== */
-    .mini-demo-wrapper {
-      background-color: var(--board-bg);
-      border: 3px solid var(--navy);
-      box-shadow: var(--shadow-sm);
-      padding: 12px 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .mini-demo-title {
-      font-size: 8.5px;
-      font-weight: bold;
-      letter-spacing: 0.5px;
-    }
-
-    .mini-demo-board {
-      display: grid;
-      grid-template-columns: repeat(4, 38px);
-      grid-template-rows: 38px;
-      gap: 6px;
-      background-color: var(--board-bg);
-      padding: 6px;
-      border: 2px solid var(--navy);
-    }
-
-    .mini-cell {
-      position: relative;
-      width: 38px;
-      height: 38px;
-    }
-
-    .mini-slot-blank {
-      width: 100%;
-      height: 100%;
-      background-color: var(--slot-empty);
-      border: 2px dashed var(--navy);
-      box-sizing: border-box;
-    }
-
-    .mini-tile {
-      width: 100%;
-      height: 100%;
-      background-color: var(--tile-bg);
-      border: 2px solid var(--navy);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: bold;
-      box-shadow: 2px 2px 0px var(--navy);
-    }
-
-    .mini-tile-player {
-      animation: miniSlidePlayer 2.4s infinite ease-in-out;
-    }
-
-    .mini-tile-mirror {
-      border: 2px dashed var(--gold-dark);
-      background-color: #FEF3C7;
-      box-shadow: 0 0 6px rgba(217, 119, 6, 0.4), 2px 2px 0px var(--navy);
-      animation: miniSlideMirror 2.4s infinite ease-in-out;
-    }
-
-    @keyframes miniSlidePlayer {
-      0%, 15% { transform: translateX(0); }
-      40%, 65% { transform: translateX(44px); } /* 38px + 6px gap */
-      85%, 100% { transform: translateX(0); }
-    }
-
-    @keyframes miniSlideMirror {
-      0%, 15% { transform: translateX(0); }
-      40%, 65% { transform: translateX(-44px); }
-      85%, 100% { transform: translateX(0); }
-    }
-
-    .mini-demo-labels {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 196px;
-      font-size: 7px;
-      font-weight: bold;
-    }
-
-    .mini-label-player { color: var(--navy); }
-    .mini-label-mirror { color: var(--gold-dark); }
-
-    .tutorial-rules-list {
+    .win-metrics-box {
+      background-color: var(--bg-panel-dark);
+      border: 2px solid var(--bg-panel-border);
+      padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      text-align: left;
+    }
+
+    .win-scores-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .win-score-pill {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--bg-panel-border-bright);
+      padding: 8px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 90px;
+    }
+
+    .win-score-pill .label {
+      font-size: 7px;
+      color: var(--text-muted);
+    }
+
+    .win-score-pill .val {
+      font-size: 16px;
+      color: var(--amber);
+      font-weight: bold;
+    }
+
+    .win-feedback-banner {
+      background-color: rgba(245, 158, 11, 0.15);
+      border: 1px dashed var(--amber);
+      padding: 10px 8px;
       font-size: 8.5px;
+      color: var(--amber);
       line-height: 1.6;
     }
 
-    .tutorial-rule-item {
+    .win-buttons-col {
       display: flex;
+      flex-direction: column;
       gap: 8px;
-      align-items: flex-start;
-    }
-
-    .tutorial-rule-item .rule-icon {
-      font-weight: bold;
-      color: var(--gold-dark);
-      min-width: 14px;
+      width: 100%;
     }
 
     /* ==========================================================================
-       MOBILE-FRIENDLY RESPONSIVE ADJUSTMENTS
+       RESPONSIVE MOBILE ADJUSTMENTS
        ========================================================================== */
+    @media (max-width: 820px) {
+      .game-main-columns {
+        flex-direction: column-reverse;
+        align-items: center;
+      }
+      .game-telemetry-col {
+        width: 100%;
+        max-width: 440px;
+      }
+      .title-menu-layout {
+        flex-direction: column;
+      }
+      .deco-sensor-card {
+        display: none;
+      }
+      .manual-steps-row {
+        grid-template-columns: 1fr;
+      }
+      .active-briefing-panel {
+        flex-direction: column;
+      }
+      .briefing-hotkeys {
+        width: 100%;
+      }
+    }
+
     @media (max-width: 480px) {
       :root {
         --board-gap: 6px;
       }
       body {
-        padding: 8px 6px;
+        padding: 6px 4px;
       }
-      .game-logo {
-        font-size: 20px;
-      }
-      .subtitle-card {
-        font-size: 9px;
-        padding: 10px 12px;
-        margin: 8px 0 12px 0;
+      .title-word-mirror,
+      .title-word-slide,
+      .title-word-slide-reflected {
+        font-size: 26px;
       }
       .board-frame {
-        max-width: 95vw;
         padding: 8px;
       }
       .tile {
-        font-size: 15px;
-      }
-      .tile.dual-choice .tile-number {
-        font-size: 13px;
+        font-size: 14px;
       }
       .direction-arrow-btn {
-        width: 22px;
-        height: 22px;
+        width: 20px;
+        height: 20px;
         font-size: 9px;
       }
       .btn {
-        font-size: 8.5px;
-        padding: 10px 6px;
-        min-height: 40px;
+        font-size: 8px;
+        padding: 8px 6px;
+        min-height: 38px;
       }
-      .sound-toggle-btn {
-        min-width: 60px;
-        padding: 6px 6px;
-      }
-      .game-controls {
-        flex-wrap: wrap;
-        gap: 6px;
-      }
-      .game-controls .btn {
-        flex: 1 1 calc(50% - 6px);
-      }
-      .stats-bar {
-        font-size: 9.5px;
-        padding: 8px 10px;
-      }
-    }
-
-    @media (max-width: 360px) {
-      .game-logo {
-        font-size: 17px;
-      }
-      .tile {
-        font-size: 13px;
-      }
-      .board-frame {
-        padding: 6px;
-      }
-      .mini-demo-board {
-        grid-template-columns: repeat(4, 30px);
-        grid-template-rows: 30px;
-      }
-      .mini-cell {
-        width: 30px;
-        height: 30px;
-      }
-      @keyframes miniSlidePlayer {
-        0%, 15% { transform: translateX(0); }
-        40%, 65% { transform: translateX(36px); }
-        85%, 100% { transform: translateX(0); }
-      }
-      @keyframes miniSlideMirror {
-        0%, 15% { transform: translateX(0); }
-        40%, 65% { transform: translateX(-36px); }
-        85%, 100% { transform: translateX(0); }
+      .terminal-top-bar,
+      .terminal-bottom-bar {
+        font-size: 6.5px;
+        padding: 4px 6px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- ==================== 1. START SCREEN ==================== -->
+  <!-- ==================== MASTER TERMINAL TOP BAR ==================== -->
+  <header class="terminal-top-bar">
+    <div class="terminal-top-left">
+      <div class="terminal-badge">■ SYS: OPTICAL_CORE</div>
+      <div id="top-sync-status" style="color: var(--text-muted);">■ SYNC: ACTIVE</div>
+    </div>
+    <div class="terminal-top-right">
+      <button id="btn-master-sound" class="btn-audio-toggle" title="Toggle audio mute">
+        🔊 AUDIO: STEREO
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== 1. START / TITLE SCREEN (IMAGE 3) ==================== -->
   <main id="start-screen" class="screen active">
-    <div class="game-logo">
-      <span>MIRROR</span>
-      <span class="gold-accent-text">SLIDE</span>
-    </div>
-
-    <!-- Required exact phrase -->
-    <div class="subtitle-card">
-      Classic sliding tiles, but every move you make is mirrored on the opposite side of the board.
-    </div>
-
-    <div class="menu-box">
-      <div class="menu-actions-row">
-        <button id="btn-main-play" class="btn btn-gold btn-lg">
-          ▶ PLAY GAME
-        </button>
-        <button id="btn-start-how-to-play" class="btn btn-lg" title="How to play instructions">
-          ❓ HOW TO PLAY
-        </button>
+    <div class="title-screen-container">
+      
+      <div class="title-meta-header">
+        <div class="title-cartridge-tag">
+          ■ CARTRIDGE #094 // OPTICAL_MIRROR
+        </div>
+        <div class="title-sound-tag">
+          ♪ BGM: ON / SFX: ON
+        </div>
       </div>
 
-      <div style="font-size: 10px; font-weight: bold; margin-top: 6px; text-align: left; text-transform: uppercase;">
-        SELECT LEVEL:
+      <div class="title-logo-block">
+        <div class="title-pre-heading">
+          —— PARALLEL REFLECTION ENGINE ——
+        </div>
+        <div class="title-word-mirror">MIRROR</div>
+        <div class="title-word-slide">SLIDE</div>
+        <div class="title-beam-divider"></div>
+        <div class="title-word-slide-reflected">ƧΓIDE</div>
       </div>
 
-      <div id="start-level-list" class="level-select-grid">
-        <!-- Level cards rendered dynamically -->
+      <!-- Required description text matching prompt -->
+      <div class="title-subtitle-card reticle-box">
+        Classic sliding tiles, but every deliberate move you make is <span class="highlight">mirrored</span> on the opposite side of the board.
       </div>
-    </div>
 
-    <div class="rules-footnote">
-      Goal: Tiles 1-14 in order, blanks at corners (0,0) and (3,3).
+      <div class="title-menu-layout">
+        <!-- Left Sensor Deco Card -->
+        <div class="deco-sensor-card">
+          <span>LIGHT SENSOR</span>
+          <div class="deco-sensor-icon">⤡</div>
+          <span>45° ANGLED</span>
+        </div>
+
+        <!-- Center Actions -->
+        <div class="title-buttons-column">
+          <button id="btn-start-game" class="btn btn-amber btn-menu-action">
+            <span>▶ START PUZZLE</span>
+            <span style="font-size: 7.5px;">[ SLOT A ]</span>
+          </button>
+          <button id="btn-open-chambers" class="btn btn-blue btn-menu-action">
+            <span>:: LEVEL SELECT</span>
+            <span id="start-screen-chamber-count" style="font-size: 7.5px;">[ 8 CHAMBERS ]</span>
+          </button>
+          <button id="btn-open-protocol" class="btn btn-menu-action">
+            <span>? OPTICS PROTOCOL</span>
+            <span style="font-size: 7.5px;">[ MANUAL ]</span>
+          </button>
+        </div>
+
+        <!-- Right Emitter Deco Card -->
+        <div class="deco-sensor-card">
+          <span>EMITTER DOCK</span>
+          <div class="deco-sensor-icon">⤢</div>
+          <span>135° SPLIT</span>
+        </div>
+      </div>
+
+      <div class="title-credits">
+        [ PRESS ANY KEY OR CLICK TO ENGAGE ]<br>
+        © 2025 PIXEL_OPTICS LABS • ALL BEAMS RESERVED
+      </div>
+
     </div>
   </main>
 
-  <!-- ==================== 2. GAMEPLAY SCREEN ==================== -->
+  <!-- ==================== 2. CHAMBER SELECT SCREEN (IMAGE 4) ==================== -->
+  <main id="levels-screen" class="screen">
+    <div class="chamber-select-layout">
+      
+      <div class="chamber-select-top">
+        <button id="btn-levels-back-title" class="btn" style="padding: 6px 10px; font-size: 8px;">
+          ← [ESC] RETURN TO TITLE
+        </button>
+        <div style="font-size: 8px; color: var(--text-muted);">
+          ■ [ CARTRIDGE #094 // LEVEL_SELECT ] :: SECTOR 01: PRISM CAVERNS
+        </div>
+        <div class="sector-clearance-bar-box">
+          <div class="sector-clearance-label">
+            <span>SECTOR CLEARANCE</span>
+            <span id="sector-clearance-pct">25%</span>
+          </div>
+          <div class="sector-progress-track">
+            <div id="sector-progress-fill" class="sector-progress-fill" style="width: 25%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chamber-headline-box reticle-box">
+        <div class="chamber-headline-sub">SECTOR GRID 01 // OPTICAL REFLECTION ARRAYS</div>
+        <div class="chamber-headline-title">CHAMBER SELECT</div>
+        <div class="chamber-headline-desc">
+          Navigate mirrored reflection chambers. Synchronize high-energy laser paths across the quartz grid to overload optical cores.
+        </div>
+      </div>
+
+      <!-- Chamber Cards Grid -->
+      <div id="chambers-grid-container" class="chambers-deck">
+        <!-- Cards generated dynamically -->
+      </div>
+
+      <!-- Active Chamber Briefing Box -->
+      <div class="active-briefing-panel reticle-box">
+        <div class="briefing-left">
+          <div id="briefing-header-tag" class="briefing-header">■ ACTIVE CHAMBER BRIEFING :: CHAMBER 01</div>
+          <div id="briefing-title-text" class="briefing-title">FIRST REFLECTION - MECHANICS</div>
+          <div id="briefing-desc-text" class="briefing-text">
+            Dual optical rails active. Position mirror nodes along the primary diagonal vectors. Beams crossing non-mirrored empty tiles will diffuse into basalt rock walls, causing energy leakage.
+          </div>
+          <div class="briefing-tags">
+            <div class="briefing-tag">GRID SIZE: 4x4</div>
+            <div class="briefing-tag">MIRROR TILES: 02</div>
+            <div class="briefing-tag">LIGHT POLARITY: AMBER</div>
+          </div>
+        </div>
+        <div class="briefing-hotkeys">
+          <div style="font-weight: bold; color: var(--amber); margin-bottom: 2px;">SECTOR CONTROLLER</div>
+          <div class="hotkey-row"><span>CHOOSE CHAMBER</span> <span class="hotkey-badge">◄ ►</span></div>
+          <div class="hotkey-row"><span>DEPLOY LASER</span> <span class="hotkey-badge">ENTER</span></div>
+          <div class="hotkey-row"><span>TITLE MENU</span> <span class="hotkey-badge">ESC</span></div>
+          <div class="hotkey-row"><span>MUTE AUDIO</span> <span class="hotkey-badge">M</span></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==================== 3. IN-GAMEPLAY SCREEN (IMAGE 1) ==================== -->
   <main id="game-screen" class="screen">
-    <!-- Header -->
-    <header class="game-header">
-      <button id="btn-back-to-menu" class="btn" title="Back to menu">
-        ◀ MENU
-      </button>
-      <div id="current-level-badge" class="level-badge">
-        LEVEL 1
+    <div class="game-screen-layout">
+      
+      <!-- Top In-Game Status & Metric Chips -->
+      <div class="game-hud-top-bar">
+        <div class="game-hud-top-left">
+          <button id="btn-pause-menu" class="btn" style="padding: 6px 10px; font-size: 8px;">
+            ⏸ [ESC] PAUSE / CHAMBERS
+          </button>
+          <div style="font-size: 8px; color: var(--amber);">■ SYNC: ACTIVE</div>
+        </div>
+        <div class="game-hud-top-right">
+          <div class="metric-chip">
+            <span class="metric-chip-label">MOVES</span>
+            <span id="move-counter-display" class="metric-chip-value gold">00</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-chip-label">PAR</span>
+            <span id="level-par-display" class="metric-chip-value">03</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-chip-label">TARGET</span>
+            <span class="metric-chip-value" style="font-size: 9px; color: var(--amber);">★★★</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-chip-label">CART #094</span>
+            <span class="metric-chip-value" style="font-size: 7px; color: var(--text-muted);">SLOT_ROM</span>
+          </div>
+        </div>
       </div>
-      <button id="btn-game-how-to-play" class="btn" title="How to play overlay">
-        ❓ HELP
-      </button>
-      <button id="btn-sound-toggle" class="btn sound-toggle-btn" title="Toggle sound">
-        🔊 ON
-      </button>
-    </header>
 
-    <!-- Stats Bar -->
-    <section class="stats-bar">
-      <div class="stat-moves">
-        MOVES: <span id="move-counter-display">0</span>
+      <!-- Main Body Columns -->
+      <div class="game-main-columns">
+        
+        <!-- Left Telemetry Column -->
+        <div class="game-telemetry-col">
+          
+          <!-- Card 1: Symmetry Protocol -->
+          <div class="hud-panel reticle-box">
+            <div class="hud-panel-header">
+              <span class="hud-panel-title">■ SYMMETRY PROTOCOL</span>
+              <span>SYS_REV: 02</span>
+            </div>
+            <div class="hud-panel-body">
+              Every tile slide in <span class="sector-alpha">Sector Alpha</span> triggers an identical inversion slide along the diagonal axis in <span class="sector-beta">Sector Beta</span>.
+            </div>
+            <div class="hud-tags-row">
+              <div class="hud-tag">COUPLING: DUAL REFLECT</div>
+              <div class="hud-tag">AXIS: 45° DIAGONAL</div>
+            </div>
+          </div>
+
+          <!-- Card 2: Optical Target Schematic Matrix -->
+          <div class="hud-panel reticle-box">
+            <div class="hud-panel-header">
+              <span class="hud-panel-title">■ OPTICAL TARGET SCHEMATIC</span>
+              <span>SOLVED MATRIX</span>
+            </div>
+            <div class="schematic-matrix-box">
+              <div class="mini-schematic-grid">
+                <div class="mini-schematic-cell socket">⌖</div>
+                <div class="mini-schematic-cell alpha">01</div>
+                <div class="mini-schematic-cell alpha">02</div>
+                <div class="mini-schematic-cell alpha">03</div>
+                <div class="mini-schematic-cell alpha">04</div>
+                <div class="mini-schematic-cell alpha">05</div>
+                <div class="mini-schematic-cell alpha">06</div>
+                <div class="mini-schematic-cell alpha">07</div>
+                <div class="mini-schematic-cell beta">08</div>
+                <div class="mini-schematic-cell beta">09</div>
+                <div class="mini-schematic-cell beta">10</div>
+                <div class="mini-schematic-cell beta">11</div>
+                <div class="mini-schematic-cell beta">12</div>
+                <div class="mini-schematic-cell beta">13</div>
+                <div class="mini-schematic-cell beta">14</div>
+                <div class="mini-schematic-cell socket">⌖</div>
+                <div class="mini-schematic-axis-line"></div>
+              </div>
+            </div>
+            <div class="hud-tags-row">
+              <div class="hud-tag" style="color: var(--amber);">ALPHA: 01-07</div>
+              <div class="hud-tag" style="color: #93C5FD;">BETA: 08-14</div>
+            </div>
+          </div>
+
+          <!-- Card 3: Linked Pair Target Status -->
+          <div class="hud-panel reticle-box">
+            <div class="hud-panel-header">
+              <span class="hud-panel-title">LINKED PAIR TARGET</span>
+              <span id="linked-pair-status-tag" class="linked-pair-tag">SYNCED</span>
+            </div>
+            <div class="linked-pair-box">
+              <span id="linked-pair-display">TILE [06] ⇄ TILE [09]</span>
+              <span style="color: var(--amber); font-weight: bold;">∞</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Puzzle Matrix Column -->
+        <div class="game-grid-col">
+          
+          <div class="chamber-header-card reticle-box">
+            <div id="chamber-current-title" class="chamber-title-text">
+              ■ CHAMBER 01 // FIRST REFLECTION ■
+            </div>
+            <div class="chamber-sub-text">
+              4X4 DUAL MATRIX // SPECULAR_LINK: ON
+            </div>
+          </div>
+
+          <!-- 4x4 Grid Frame -->
+          <div class="board-frame reticle-box" aria-label="4x4 Reflector Core Board">
+            
+            <div class="grid-status-header">
+              <span class="core-title">REFLECTOR CORE // ACTIVE GRID</span>
+              <span id="empty-sockets-counter">EMPTY SOCKETS: 02 ■</span>
+            </div>
+
+            <div class="board-grid-wrapper">
+              
+              <!-- 45° Diagonal Mirror Axis Line & Badge -->
+              <div class="mirror-axis-overlay">
+                <svg class="mirror-axis-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <line x1="0" y1="100" x2="100" y2="0" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.8" />
+                </svg>
+                <div class="mirror-axis-badge">
+                  --- MIRROR AXIS 45° ---
+                </div>
+              </div>
+
+              <!-- The 16 Cells Grid -->
+              <div id="board-grid" class="board-grid">
+                <!-- 16 Cells rendered dynamically -->
+              </div>
+
+            </div>
+
+            <div class="grid-status-footer">
+              <span id="slide-register-status">SLIDE REGISTER: [READY]</span>
+              <span>MIRROR POLARITY: INVERTED</span>
+            </div>
+
+          </div>
+
+          <!-- Game Actions Row -->
+          <div class="game-actions-bar">
+            <button id="btn-undo" class="btn" title="Undo Move (Z)">
+              ↶ [Z] UNDO
+            </button>
+            <button id="btn-restart" class="btn" title="Restart Chamber (R)">
+              ↻ [R] RESTART
+            </button>
+            <button id="btn-hint" class="btn btn-amber" title="Show Suggested Move (H)">
+              💡 [H] HINT
+            </button>
+          </div>
+
+        </div>
+
       </div>
-      <div class="stat-par">
-        PAR: <span id="level-par-display">-</span>
-      </div>
-      <button id="btn-toggle-hint" class="btn" style="font-size: 8.5px; padding: 4px 8px;">
-        💡 HINT
-      </button>
-    </section>
 
-    <!-- Hint Banner (Collapsible) -->
-    <aside id="hint-banner" class="hint-banner">
-      <span class="hint-icon">💡</span>
-      <span id="hint-text">Slide tile 1 to the right — watch how tile 14 copies the motion!</span>
-    </aside>
-
-    <!-- 4x4 Puzzle Board -->
-    <section class="board-frame" aria-label="4x4 Mirror Slide Board">
-      <div id="board-grid" class="board-grid">
-        <!-- 16 Cells rendered dynamically -->
-      </div>
-    </section>
-
-    <!-- Game Controls: Undo, Restart, Levels -->
-    <nav class="game-controls">
-      <button id="btn-undo" class="btn" title="Undo Move (Z)">
-        UNDO (Z)
-      </button>
-      <button id="btn-restart" class="btn" title="Restart Level (R)">
-        RESTART (R)
-      </button>
-      <button id="btn-open-levels" class="btn" title="Level Select">
-        LEVELS
-      </button>
-    </nav>
-
-    <footer class="rules-footnote">
-      Click a movable tile to slide it & its mirror partner simultaneously.
-    </footer>
+    </div>
   </main>
 
-  <!-- ==================== 3. WIN SCREEN MODAL ==================== -->
+  <!-- ==================== 4. HOW TO PLAY / MANUAL OVERLAY (IMAGE 2) ==================== -->
+  <div id="tutorial-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="manual-title">
+    <div class="manual-modal-card reticle-box">
+      
+      <div class="manual-modal-header">
+        <div id="manual-title" class="manual-modal-title">
+          <span>■ [ HOW TO PLAY // MANUAL ]</span>
+        </div>
+        <button id="btn-close-manual" class="btn" style="padding: 4px 8px; font-size: 7.5px;">
+          ✕ [ESC] CLOSE
+        </button>
+      </div>
+
+      <div class="manual-steps-row">
+        
+        <!-- Step 1: Input -->
+        <div class="manual-step-panel">
+          <div class="step-panel-header">
+            <span>STEP 01</span>
+            <span class="step-panel-tag">INPUT</span>
+          </div>
+          <div class="step-diagram-box">
+            <div style="display: grid; grid-template-columns: repeat(2, 24px); gap: 4px;">
+              <div style="background: var(--tile-bg); color: var(--tile-text); font-size: 7px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid #000;">05 →</div>
+              <div style="border: 1px dashed var(--bg-panel-border-bright); font-size: 6px; display: flex; align-items: center; justify-content: center; color: var(--text-dim);">0</div>
+              <div style="background: var(--tile-bg); color: var(--tile-text); font-size: 7px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid #000;">08</div>
+              <div style="background: var(--tile-bg); color: var(--tile-text); font-size: 7px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid #000;">09</div>
+            </div>
+          </div>
+          <div class="step-title">SLIDE A TILE</div>
+          <div class="step-desc">Slide any adjacent tile into an empty cell socket.</div>
+        </div>
+
+        <!-- Step 2: Reflect -->
+        <div class="manual-step-panel">
+          <div class="step-panel-header">
+            <span>STEP 02</span>
+            <span class="step-panel-tag">REFLECT</span>
+          </div>
+          <div class="step-diagram-box" style="position: relative;">
+            <svg style="position: absolute; inset: 0; width: 100%; height: 100%;" viewBox="0 0 100 100">
+              <line x1="0" y1="100" x2="100" y2="0" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="2,2"/>
+            </svg>
+            <div style="display: grid; grid-template-columns: repeat(2, 24px); gap: 4px; position: relative; z-index: 2;">
+              <div style="border: 1px dashed var(--bg-panel-border-bright); font-size: 6px; display: flex; align-items: center; justify-content: center; color: var(--text-dim);">0</div>
+              <div style="background: var(--amber); color: #000; font-size: 7px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid #000;">06</div>
+              <div style="background: var(--blue-sector); color: #FFF; font-size: 7px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid #000;">09</div>
+              <div style="border: 1px dashed var(--bg-panel-border-bright); font-size: 6px; display: flex; align-items: center; justify-content: center; color: var(--text-dim);">0</div>
+            </div>
+          </div>
+          <div class="step-title">MIRROR TWIN</div>
+          <div class="step-desc">Its mirror twin slides simultaneously on the opposite diagonal axis.</div>
+        </div>
+
+        <!-- Step 3: Target -->
+        <div class="manual-step-panel">
+          <div class="step-panel-header">
+            <span>STEP 03</span>
+            <span class="step-panel-tag">TARGET</span>
+          </div>
+          <div class="step-diagram-box" style="flex-direction: column; gap: 4px;">
+            <div style="display: flex; gap: 3px;">
+              <div style="background: var(--amber); color: #000; font-size: 7px; padding: 3px 5px; font-weight: bold; border: 1px solid #000;">01</div>
+              <div style="background: var(--amber); color: #000; font-size: 7px; padding: 3px 5px; font-weight: bold; border: 1px solid #000;">02</div>
+              <div style="background: var(--amber); color: #000; font-size: 7px; padding: 3px 5px; font-weight: bold; border: 1px solid #000;">03</div>
+            </div>
+            <div style="color: var(--amber); font-size: 6.5px; font-weight: bold;">✔ CALIBRATED</div>
+          </div>
+          <div class="step-title">SOLVE SEQUENCE</div>
+          <div class="step-desc">Order tiles 01 to 14 in sequence to calibrate the optical core.</div>
+        </div>
+
+      </div>
+
+      <button id="btn-manual-resume" class="btn btn-amber manual-commence-btn">
+        ▶ [ SPACE ] RESUME PUZZLE // COMMENCE
+      </button>
+
+      <div class="manual-dismiss-note">
+        PRESS [ESC] OR [SPACE] TO DISMISS MANUAL
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== 5. CHAMBER CLEAR / WIN SCREEN ==================== -->
   <div id="win-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="win-title">
-    <div class="modal-card">
-      <div id="win-title" class="win-title">
-        <span class="gold-accent-text">★</span>
-        <span>PUZZLE SOLVED!</span>
-        <span class="gold-accent-text">★</span>
+    <div class="win-modal-card reticle-box">
+      
+      <div id="win-title" class="win-header-title">
+        ■ OPTICAL CORE CALIBRATED // CHAMBER CLEAR ■
       </div>
 
-      <div class="win-moves-summary">
-        <div id="win-level-name" style="font-weight: bold; margin-bottom: 8px; font-size: 11px;">Level 1</div>
-        <div class="win-score-box">
-          <div class="score-pill">
-            <span class="score-label">MOVES</span>
-            <span id="win-moves-count" class="score-val gold-accent-text">0</span>
+      <div class="win-metrics-box">
+        <div id="win-level-name" style="font-size: 11px; font-weight: bold; color: var(--text-primary);">
+          CHAMBER 01: FIRST REFLECTION
+        </div>
+
+        <div class="win-scores-row">
+          <div class="win-score-pill">
+            <span class="label">MOVES</span>
+            <span id="win-moves-count" class="val">03</span>
           </div>
-          <div class="score-divider">VS</div>
-          <div class="score-pill">
-            <span class="score-label">PAR</span>
-            <span id="win-par-count" class="score-val">0</span>
+          <div style="color: var(--text-muted); font-size: 10px; font-weight: bold;">VS</div>
+          <div class="win-score-pill">
+            <span class="label">PAR</span>
+            <span id="win-par-count" class="val">03</span>
           </div>
         </div>
-        <div id="win-par-summary" class="win-par-summary"></div>
-        <div id="win-message" class="win-one-liner">
-          ★ FLAWLESS! You matched par! ★
+
+        <div id="win-efficiency-rank" style="font-size: 8px; color: var(--amber); font-weight: bold;">
+          CALIBRATION: S-RANK [FLAWLESS] ★★★
+        </div>
+
+        <div id="win-message" class="win-feedback-banner">
+          ★ SPECULAR MATRIX HARMONIZED! OPTICAL CORE STABILIZED ★
         </div>
       </div>
 
-      <div class="modal-buttons">
-        <button id="btn-next-level" class="btn btn-gold btn-lg">
-          NEXT LEVEL ▶
+      <div class="win-buttons-col">
+        <button id="btn-next-level" class="btn btn-amber" style="padding: 12px; font-size: 10px;">
+          NEXT CHAMBER [ENTER] ▶
         </button>
         <button id="btn-replay-level" class="btn">
-          REPLAY LEVEL
+          ↺ RECALIBRATE [REPLAY]
         </button>
         <button id="btn-win-level-select" class="btn">
-          ALL LEVELS
+          :: CHAMBER SELECT [ALL]
         </button>
       </div>
+
     </div>
   </div>
 
-  <!-- ==================== 4. HOW TO PLAY OVERLAY ==================== -->
-  <div id="tutorial-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
-    <div class="modal-card">
-      <div id="tutorial-title" class="win-title" style="font-size: 13px;">
-        <span class="gold-accent-text">🪞</span>
-        <span>HOW TO PLAY</span>
-        <span class="gold-accent-text">🪞</span>
-      </div>
-
-      <!-- Animated Mini-Demo -->
-      <div class="mini-demo-wrapper">
-        <div class="mini-demo-title">MIRROR MOVEMENT DEMO</div>
-        <div class="mini-demo-board">
-          <div class="mini-cell">
-            <div class="mini-tile mini-tile-player">1</div>
-          </div>
-          <div class="mini-cell mini-slot-blank"></div>
-          <div class="mini-cell mini-slot-blank"></div>
-          <div class="mini-cell">
-            <div class="mini-tile mini-tile-mirror">14</div>
-          </div>
-        </div>
-        <div class="mini-demo-labels">
-          <span class="mini-label-player">YOU SLIDE ▶</span>
-          <span class="mini-label-mirror">◀ TWIN REVERSES</span>
-        </div>
-      </div>
-
-      <div class="tutorial-rules-list">
-        <div class="tutorial-rule-item">
-          <span class="rule-icon">1.</span>
-          <span><strong>The Goal:</strong> Order tiles <strong>1 to 14</strong> in reading order. Leave the top-left (★) and bottom-right (★) corners empty.</span>
-        </div>
-        <div class="tutorial-rule-item">
-          <span class="rule-icon">2.</span>
-          <span><strong>The Twist:</strong> Every move mirrors! When you slide a tile, its opposite twin slides across the board in reverse.</span>
-        </div>
-        <div class="tutorial-rule-item">
-          <span class="rule-icon">3.</span>
-          <span><strong>Mirror Ghost:</strong> Hover over any tile to preview its glowing gold mirror partner!</span>
-        </div>
-      </div>
-
-      <button id="btn-close-tutorial" class="btn btn-gold btn-lg" style="width: 100%;">
-        GOT IT! LET'S PLAY ▶
-      </button>
+  <!-- ==================== MASTER TERMINAL BOTTOM BAR ==================== -->
+  <footer class="terminal-bottom-bar">
+    <div style="color: var(--text-muted);">
+      [ ARROWS / WASD ] SLIDE TILE &nbsp;&nbsp; [ Z ] UNDO &nbsp;&nbsp; [ R ] RESTART &nbsp;&nbsp; [ H ] HINT &nbsp;&nbsp; [ ESC ] MENU
     </div>
-  </div>
-
-  <!-- ==================== 5. LEVEL SELECT MODAL ==================== -->
-  <div id="levels-modal" class="modal-overlay" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <div style="font-size: 13px; font-weight: bold;">
-        SELECT A LEVEL
-      </div>
-
-      <div id="modal-level-list" class="level-select-grid" style="max-height: 260px; overflow-y: auto;">
-        <!-- Level cards inserted dynamically -->
-      </div>
-
-      <button id="btn-close-levels-modal" class="btn" style="margin-top: 8px;">
-        ✕ CLOSE
-      </button>
+    <div style="display: flex; gap: 12px;">
+      <span>VER: 1.0.4-CART</span>
+      <span style="color: var(--amber);">FPS: 60 [LOCKED]</span>
     </div>
-  </div>
+  </footer>
 
   <!-- Load Levels from external levels.js file as required -->
   <script src="levels.js"></script>
@@ -1124,19 +1894,18 @@
     if (typeof window.LEVELS === 'undefined' || !Array.isArray(window.LEVELS) || window.LEVELS.length === 0) {
       window.LEVELS = [
         {
-          name: "Level 1: First Reflection",
-          hint: "Slide tile 1 to the right — watch how tile 14 copies the motion!",
-          start: [1, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 14]
+          name: "Chamber 01: First Reflection",
+          hint: "Slide tile 01 to the right — watch how tile 14 copies the motion along the diagonal axis!",
+          start: [1, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 14],
+          optimal: 3,
+          solution: [[2, "down"], [1, "right"], [0, "right"]]
         },
         {
-          name: "Level 2: The Crossroads",
-          hint: "Tiles 6 and 9 touch both blanks! Click either directional arrow to choose your path.",
-          start: [1, 5, 2, 3, 4, 0, 6, 7, 8, 9, 0, 11, 12, 13, 10, 14]
-        },
-        {
-          name: "Level 3: Twin Dance",
-          hint: "The blanks travel down the outer columns. Bring tile 7 and tile 8 into place first.",
-          start: [1, 2, 3, 7, 4, 5, 6, 0, 0, 9, 10, 11, 8, 12, 13, 14]
+          name: "Chamber 02: Refraction 45°",
+          hint: "Dual optical rails active. Position mirror nodes along the primary diagonal vectors.",
+          start: [1, 2, 3, 7, 0, 5, 6, 11, 4, 9, 10, 0, 8, 12, 13, 14],
+          optimal: 5,
+          solution: [[7, "down"], [3, "down"], [2, "right"], [1, "right"], [0, "right"]]
         }
       ];
     }
@@ -1154,15 +1923,9 @@
 
     /**
      * Pure function: applyMove(state, tileCell, direction)
-     * 
      * Applies a mirrored sliding move to the 4x4 board.
-     * Tile in tileCell slides in direction into an adjacent blank (0).
-     * Simultaneously, the tile at mirrored cell (3-r, 3-c) slides in the mirrored direction.
-     * 
-     * @param {Array<number>} state - 16-element board array (0 = blank, 1-14 = tiles)
-     * @param {number} tileCell - Board index 0..15 of the tile to slide
-     * @param {string|object} direction - Direction: 'up' | 'down' | 'left' | 'right' or {dr, dc}
-     * @returns {Array<number>|null} - Cloned new board array or null if move is illegal
+     * Tile in tileCell slides into adjacent blank (0).
+     * Simultaneously, tile at mirrored cell (3-r, 3-c) slides in inverted direction.
      */
     function applyMove(state, tileCell, direction) {
       if (!Array.isArray(state) || state.length !== 16) return null;
@@ -1206,7 +1969,7 @@
 
     /**
      * Pure function: isSolved(state)
-     * Win condition: tiles 1-14 in reading order in cells 1..14, blanks in cells 0 and 15.
+     * Win condition: tiles 1-14 in reading order in cells 1..14, blanks at cells 0 and 15.
      */
     function isSolved(state) {
       if (!Array.isArray(state) || state.length !== 16) return false;
@@ -1217,10 +1980,6 @@
       return true;
     }
 
-    /**
-     * Pure helper: getLegalDirections(state, cell)
-     * Returns an array of direction names ('up' | 'down' | 'left' | 'right') valid for the tile at cell.
-     */
     function getLegalDirections(state, cell) {
       if (state[cell] === 0) return [];
       const valid = [];
@@ -1232,26 +1991,17 @@
       return valid;
     }
 
-    /**
-     * Pure helper: getMirrorCell(cell)
-     */
     function getMirrorCell(cell) {
       return 15 - cell;
     }
 
     /* ==========================================================================
-       SYNTHESIZED RETRO AUDIO (WEB AUDIO API - ZERO EXTERNAL ASSETS)
-       - Tile click
-       - Mirror "ping"
-       - Win jingle
-       - Bump for illegal moves
-       - Persistent mute button
+       SYNTHESIZED SCI-FI AUDIO (WEB AUDIO API - ZERO EXTERNAL ASSETS)
        ========================================================================== */
 
     let audioCtx = null;
     let isSoundMuted = false;
 
-    // Load initial mute state from localStorage
     try {
       if (typeof localStorage !== 'undefined') {
         isSoundMuted = localStorage.getItem('mirror_slide_sound_muted') === 'true';
@@ -1279,12 +2029,12 @@
         const now = ctx.currentTime;
 
         if (type === 'tile-click' || type === 'slide') {
-          // Tactile tile click / tap (crisp retro damped triangle)
+          // Tactile mechanical quartz relay click
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(640, now);
-          osc.frequency.exponentialRampToValueAtTime(160, now + 0.038);
+          osc.frequency.setValueAtTime(680, now);
+          osc.frequency.exponentialRampToValueAtTime(140, now + 0.038);
           gain.gain.setValueAtTime(0.18, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.038);
           osc.connect(gain);
@@ -1293,12 +2043,12 @@
           osc.stop(now + 0.04);
 
         } else if (type === 'mirror-ping') {
-          // Resonant celestial mirror "ping"
+          // High bright resonant optical mirror ping
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(1480, now);
-          osc.frequency.exponentialRampToValueAtTime(1180, now + 0.18);
+          osc.frequency.setValueAtTime(1520, now);
+          osc.frequency.exponentialRampToValueAtTime(1200, now + 0.18);
           gain.gain.setValueAtTime(0.09, now);
           gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
           osc.connect(gain);
@@ -1321,7 +2071,7 @@
           osc.stop(now + 0.1);
 
         } else if (type === 'win') {
-          // Upbeat celebratory victory arpeggio: C5, E5, G5, B5, C6
+          // Victory 5-note celebratory optical arpeggio: C5, E5, G5, B5, C6
           const notes = [
             { f: 523.25, t: 0.00, d: 0.11 },
             { f: 659.25, t: 0.10, d: 0.11 },
@@ -1357,13 +2107,11 @@
           osc.start(now);
           osc.stop(now + 0.09);
         }
-      } catch (e) {
-        // Silent fallback
-      }
+      } catch (e) {}
     }
 
     /* ==========================================================================
-       GAME STATE & UI MANAGER
+       GAME STATE & UI CONTROLLER
        ========================================================================== */
 
     const Game = {
@@ -1374,111 +2122,125 @@
       isWon: false,
       hoveredCell: null,
       isAnimating: false,
+      clearedLevels: new Set(),
 
       init() {
         this.cacheDOM();
         this.bindEvents();
         this.updateSoundButtonUI();
-        this.renderStartScreenLevels();
-        this.renderModalLevels();
+        this.renderChamberCards();
       },
 
       cacheDOM() {
         this.dom = {
           startScreen: document.getElementById('start-screen'),
+          levelsScreen: document.getElementById('levels-screen'),
           gameScreen: document.getElementById('game-screen'),
-          winModal: document.getElementById('win-modal'),
           tutorialModal: document.getElementById('tutorial-modal'),
-          levelsModal: document.getElementById('levels-modal'),
-          startLevelList: document.getElementById('start-level-list'),
-          modalLevelList: document.getElementById('modal-level-list'),
-          boardGrid: document.getElementById('board-grid'),
+          winModal: document.getElementById('win-modal'),
+
+          // Navigation buttons
+          btnMasterSound: document.getElementById('btn-master-sound'),
+          btnStartGame: document.getElementById('btn-start-game'),
+          btnOpenChambers: document.getElementById('btn-open-chambers'),
+          btnOpenProtocol: document.getElementById('btn-open-protocol'),
+          btnLevelsBackTitle: document.getElementById('btn-levels-back-title'),
+          btnPauseMenu: document.getElementById('btn-pause-menu'),
+          btnCloseManual: document.getElementById('btn-close-manual'),
+          btnManualResume: document.getElementById('btn-manual-resume'),
+
+          // In-game controls
+          btnUndo: document.getElementById('btn-undo'),
+          btnRestart: document.getElementById('btn-restart'),
+          btnHint: document.getElementById('btn-hint'),
+
+          // Win modal buttons
+          btnNextLevel: document.getElementById('btn-next-level'),
+          btnReplayLevel: document.getElementById('btn-replay-level'),
+          btnWinLevelSelect: document.getElementById('btn-win-level-select'),
+
+          // Metric elements
           moveCounterDisplay: document.getElementById('move-counter-display'),
           levelParDisplay: document.getElementById('level-par-display'),
-          currentLevelBadge: document.getElementById('current-level-badge'),
-          hintBanner: document.getElementById('hint-banner'),
-          hintText: document.getElementById('hint-text'),
+          chamberCurrentTitle: document.getElementById('chamber-current-title'),
+          boardGrid: document.getElementById('board-grid'),
+          slideRegisterStatus: document.getElementById('slide-register-status'),
+          linkedPairDisplay: document.getElementById('linked-pair-display'),
+          linkedPairStatusTag: document.getElementById('linked-pair-status-tag'),
+
+          // Chamber select screen elements
+          chambersGridContainer: document.getElementById('chambers-grid-container'),
+          sectorClearancePct: document.getElementById('sector-clearance-pct'),
+          sectorProgressFill: document.getElementById('sector-progress-fill'),
+          briefingHeaderTag: document.getElementById('briefing-header-tag'),
+          briefingTitleText: document.getElementById('briefing-title-text'),
+          briefingDescText: document.getElementById('briefing-desc-text'),
+
+          // Win screen elements
           winLevelName: document.getElementById('win-level-name'),
           winMovesCount: document.getElementById('win-moves-count'),
           winParCount: document.getElementById('win-par-count'),
-          winParSummary: document.getElementById('win-par-summary'),
-          winMessage: document.getElementById('win-message'),
-          btnMainPlay: document.getElementById('btn-main-play'),
-          btnStartHowToPlay: document.getElementById('btn-start-how-to-play'),
-          btnGameHowToPlay: document.getElementById('btn-game-how-to-play'),
-          btnCloseTutorial: document.getElementById('btn-close-tutorial'),
-          btnBackToMenu: document.getElementById('btn-back-to-menu'),
-          btnSoundToggle: document.getElementById('btn-sound-toggle'),
-          btnToggleHint: document.getElementById('btn-toggle-hint'),
-          btnUndo: document.getElementById('btn-undo'),
-          btnRestart: document.getElementById('btn-restart'),
-          btnOpenLevels: document.getElementById('btn-open-levels'),
-          btnCloseLevelsModal: document.getElementById('btn-close-levels-modal'),
-          btnNextLevel: document.getElementById('btn-next-level'),
-          btnReplayLevel: document.getElementById('btn-replay-level'),
-          btnWinLevelSelect: document.getElementById('btn-win-level-select')
+          winEfficiencyRank: document.getElementById('win-efficiency-rank'),
+          winMessage: document.getElementById('win-message')
         };
       },
 
       bindEvents() {
-        // Navigation buttons
-        this.dom.btnMainPlay.addEventListener('click', () => {
+        // Master Audio Toggle
+        this.dom.btnMasterSound.addEventListener('click', () => {
+          this.toggleSound();
+        });
+
+        // Title Screen Navigation
+        this.dom.btnStartGame.addEventListener('click', () => {
           getAudioContext();
           this.startLevel(0);
         });
 
-        this.dom.btnStartHowToPlay.addEventListener('click', () => {
-          this.openTutorialModal();
+        this.dom.btnOpenChambers.addEventListener('click', () => {
+          getAudioContext();
+          this.showScreen('levels');
         });
 
-        this.dom.btnGameHowToPlay.addEventListener('click', () => {
-          this.openTutorialModal();
+        this.dom.btnOpenProtocol.addEventListener('click', () => {
+          this.openManualModal();
         });
 
-        this.dom.btnCloseTutorial.addEventListener('click', () => {
-          try {
-            localStorage.setItem('mirror_slide_tutorial_seen', 'true');
-          } catch (e) {}
-          this.closeTutorialModal();
-        });
-
-        this.dom.btnBackToMenu.addEventListener('click', () => {
+        this.dom.btnLevelsBackTitle.addEventListener('click', () => {
           this.showScreen('start');
         });
 
-        this.dom.btnSoundToggle.addEventListener('click', () => {
-          isSoundMuted = !isSoundMuted;
+        // In-Game Pause -> Chamber Select
+        this.dom.btnPauseMenu.addEventListener('click', () => {
+          this.showScreen('levels');
+        });
+
+        // Manual Dismiss
+        this.dom.btnCloseManual.addEventListener('click', () => {
+          this.closeManualModal();
+        });
+
+        this.dom.btnManualResume.addEventListener('click', () => {
           try {
-            localStorage.setItem('mirror_slide_sound_muted', isSoundMuted ? 'true' : 'false');
+            localStorage.setItem('mirror_slide_tutorial_seen', 'true');
           } catch (e) {}
-          this.updateSoundButtonUI();
-          if (!isSoundMuted) {
-            playSound('tile-click');
-          }
+          this.closeManualModal();
         });
 
-        this.dom.btnToggleHint.addEventListener('click', () => {
-          const isHidden = this.dom.hintBanner.style.display === 'none';
-          this.dom.hintBanner.style.display = isHidden ? 'flex' : 'none';
-        });
-
-        // Game action buttons
-        this.dom.btnRestart.addEventListener('click', () => {
-          this.restartLevel();
-        });
-
+        // Game Actions
         this.dom.btnUndo.addEventListener('click', () => {
           this.undoMove();
         });
 
-        this.dom.btnOpenLevels.addEventListener('click', () => {
-          this.openLevelsModal();
+        this.dom.btnRestart.addEventListener('click', () => {
+          this.restartLevel();
         });
 
-        this.dom.btnCloseLevelsModal.addEventListener('click', () => {
-          this.closeLevelsModal();
+        this.dom.btnHint.addEventListener('click', () => {
+          this.triggerHint();
         });
 
+        // Win Modal Actions
         this.dom.btnNextLevel.addEventListener('click', () => {
           this.closeWinModal();
           const nextIdx = (this.currentLevelIndex + 1) % window.LEVELS.length;
@@ -1492,18 +2254,59 @@
 
         this.dom.btnWinLevelSelect.addEventListener('click', () => {
           this.closeWinModal();
-          this.openLevelsModal();
+          this.showScreen('levels');
         });
 
-        // Keyboard Controls: Z for Undo, R for Restart, Arrow keys / WASD for sliding
+        // Global Keyboard Controls
         window.addEventListener('keydown', (e) => {
+          if (e.key === 'm' || e.key === 'M') {
+            this.toggleSound();
+            return;
+          }
+
+          if (this.dom.tutorialModal.classList.contains('active')) {
+            if (e.key === 'Escape' || e.key === ' ' || e.code === 'Space') {
+              e.preventDefault();
+              this.closeManualModal();
+            }
+            return;
+          }
+
+          if (this.dom.winModal.classList.contains('active')) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              this.dom.btnNextLevel.click();
+            } else if (e.key === 'Escape') {
+              e.preventDefault();
+              this.closeWinModal();
+              this.showScreen('levels');
+            }
+            return;
+          }
+
+          // In Levels Screen: ESC returns to Title
+          if (this.dom.levelsScreen.classList.contains('active')) {
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              this.showScreen('start');
+            }
+            return;
+          }
+
+          // In Game Screen:
           if (this.dom.gameScreen.classList.contains('active')) {
-            if (e.key === 'z' || e.key === 'Z') {
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              this.showScreen('levels');
+            } else if (e.key === 'z' || e.key === 'Z') {
               e.preventDefault();
               this.undoMove();
             } else if (e.key === 'r' || e.key === 'R') {
               e.preventDefault();
               this.restartLevel();
+            } else if (e.key === 'h' || e.key === 'H') {
+              e.preventDefault();
+              this.triggerHint();
             } else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D'].includes(e.key)) {
               let dir = null;
               if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') dir = 'up';
@@ -1512,12 +2315,10 @@
               if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') dir = 'right';
 
               if (dir) {
-                // If a cell is hovered, try to move it
                 if (this.hoveredCell !== null && getLegalDirections(this.boardState, this.hoveredCell).includes(dir)) {
                   e.preventDefault();
                   this.executeMove(this.hoveredCell, dir);
                 } else {
-                  // Find any tile that can legally move in this direction
                   let moved = false;
                   for (let c = 0; c < 16; c++) {
                     if (getLegalDirections(this.boardState, c).includes(dir)) {
@@ -1527,10 +2328,7 @@
                       break;
                     }
                   }
-                  if (!moved) {
-                    // Illegal move feedback
-                    playSound('bump');
-                  }
+                  if (!moved) playSound('bump');
                 }
               }
             }
@@ -1538,19 +2336,32 @@
         });
       },
 
+      toggleSound() {
+        isSoundMuted = !isSoundMuted;
+        try {
+          localStorage.setItem('mirror_slide_sound_muted', isSoundMuted ? 'true' : 'false');
+        } catch (e) {}
+        this.updateSoundButtonUI();
+        if (!isSoundMuted) playSound('tile-click');
+      },
+
       updateSoundButtonUI() {
-        if (this.dom.btnSoundToggle) {
-          this.dom.btnSoundToggle.textContent = isSoundMuted ? '🔇 OFF' : '🔊 ON';
-          this.dom.btnSoundToggle.setAttribute('aria-pressed', isSoundMuted ? 'false' : 'true');
+        if (this.dom.btnMasterSound) {
+          this.dom.btnMasterSound.textContent = isSoundMuted ? '🔇 AUDIO: MUTED' : '🔊 AUDIO: STEREO';
         }
       },
 
       showScreen(screen) {
+        this.dom.startScreen.classList.remove('active');
+        this.dom.levelsScreen.classList.remove('active');
+        this.dom.gameScreen.classList.remove('active');
+
         if (screen === 'start') {
           this.dom.startScreen.classList.add('active');
-          this.dom.gameScreen.classList.remove('active');
-        } else {
-          this.dom.startScreen.classList.remove('active');
+        } else if (screen === 'levels') {
+          this.renderChamberCards();
+          this.dom.levelsScreen.classList.add('active');
+        } else if (screen === 'game') {
           this.dom.gameScreen.classList.add('active');
         }
       },
@@ -1563,7 +2374,6 @@
         this.currentLevelIndex = levelIndex;
         const levelData = window.LEVELS[this.currentLevelIndex];
 
-        // Clone level start state
         this.boardState = [...levelData.start];
         this.history = [];
         this.moveCount = 0;
@@ -1571,29 +2381,28 @@
         this.hoveredCell = null;
         this.isAnimating = false;
 
-        // Update headers & hints
-        const par = levelData.optimal || (levelData.solution ? levelData.solution.length : '-');
-        this.dom.currentLevelBadge.textContent = `LVL ${this.currentLevelIndex + 1}/${window.LEVELS.length}`;
-        if (this.dom.levelParDisplay) {
-          this.dom.levelParDisplay.textContent = par;
-        }
-        this.dom.hintText.textContent = levelData.hint || "Align tiles 1-14 with corners blank.";
-        this.dom.hintBanner.style.display = 'flex';
-        this.updateStats();
+        const par = levelData.optimal || (levelData.solution ? levelData.solution.length : 3);
+        const parStr = par < 10 ? '0' + par : '' + par;
+        const chamberNum = (this.currentLevelIndex + 1 < 10 ? '0' : '') + (this.currentLevelIndex + 1);
 
+        this.dom.chamberCurrentTitle.textContent = `■ CHAMBER ${chamberNum} // ${levelData.name.replace(/^Level\s*\d+\s*[-:]*\s*/i, '').toUpperCase()} ■`;
+        this.dom.levelParDisplay.textContent = parStr;
+        this.dom.slideRegisterStatus.textContent = 'SLIDE REGISTER: [READY]';
+        this.dom.linkedPairDisplay.textContent = 'TILE [01] ⇄ TILE [14]';
+        this.dom.linkedPairStatusTag.textContent = 'STANDBY';
+
+        this.updateStats();
         this.renderBoard();
         this.showScreen('game');
-        this.renderStartScreenLevels();
-        this.renderModalLevels();
 
-        // Show tutorial automatically on the first level if never seen
+        // Check if tutorial modal should open for Level 1
         if (levelIndex === 0) {
           let seen = false;
           try {
             seen = localStorage.getItem('mirror_slide_tutorial_seen') === 'true';
           } catch (e) {}
           if (!seen) {
-            this.openTutorialModal();
+            this.openManualModal();
           }
         }
       },
@@ -1625,8 +2434,24 @@
       },
 
       updateStats() {
-        this.dom.moveCounterDisplay.textContent = this.moveCount;
+        const movesStr = this.moveCount < 10 ? '0' + this.moveCount : '' + this.moveCount;
+        this.dom.moveCounterDisplay.textContent = movesStr;
         this.dom.btnUndo.disabled = (this.history.length === 0 || this.isAnimating);
+      },
+
+      triggerHint() {
+        const lvl = window.LEVELS[this.currentLevelIndex];
+        if (lvl && lvl.solution && lvl.solution.length > 0) {
+          // Highlight first step or legal move
+          const [hintCell] = lvl.solution[0];
+          this.hoveredCell = hintCell;
+          this.refreshHighlights();
+          playSound('tile-click');
+          setTimeout(() => {
+            this.hoveredCell = null;
+            this.refreshHighlights();
+          }, 1200);
+        }
       },
 
       executeMove(cell, direction) {
@@ -1634,12 +2459,11 @@
 
         const nextState = applyMove(this.boardState, cell, direction);
         if (!nextState) {
-          // Illegal move: provide bump audio and tactile visual shake
           playSound('bump');
           const tileEl = this.dom.boardGrid.querySelector(`.tile[data-cell="${cell}"]`);
           if (tileEl) {
             tileEl.classList.remove('tile-bump');
-            void tileEl.offsetWidth; // Trigger reflow
+            void tileEl.offsetWidth;
             tileEl.classList.add('tile-bump');
             setTimeout(() => {
               if (tileEl) tileEl.classList.remove('tile-bump');
@@ -1648,14 +2472,12 @@
           return;
         }
 
-        // Move is legal: Lock interactions during the 120ms slide animation
         this.isAnimating = true;
+        this.dom.slideRegisterStatus.textContent = 'SLIDE REGISTER: [INVERTING...]';
 
-        // Sound effects: Tactile tile click + resonant mirror ping
         playSound('tile-click');
         setTimeout(() => playSound('mirror-ping'), 25);
 
-        // Calculate mirror cell and inverted direction
         const mirrorCell = getMirrorCell(cell);
         const dirObj = DIRS[direction.toLowerCase()];
         const mirrorDir = dirObj.opposite;
@@ -1663,24 +2485,28 @@
         const tile1El = this.dom.boardGrid.querySelector(`.tile[data-cell="${cell}"]`);
         const tile2El = this.dom.boardGrid.querySelector(`.tile[data-cell="${mirrorCell}"]`);
 
-        if (tile1El) {
-          tile1El.classList.add(`sliding-${direction}`);
-        }
-        if (tile2El) {
-          tile2El.classList.add(`sliding-${mirrorDir}`, 'ghost-slide');
-        }
+        if (tile1El) tile1El.classList.add(`sliding-${direction}`);
+        if (tile2El) tile2El.classList.add(`sliding-${mirrorDir}`, 'ghost-slide');
 
-        // After the 120ms slide completes, commit state and re-render
+        // Update pair status
+        const v1 = this.boardState[cell];
+        const v2 = this.boardState[mirrorCell];
+        const s1 = v1 < 10 ? '0' + v1 : '' + v1;
+        const s2 = v2 < 10 ? '0' + v2 : '' + v2;
+        this.dom.linkedPairDisplay.textContent = `TILE [${s1}] ⇄ TILE [${s2}]`;
+        this.dom.linkedPairStatusTag.textContent = 'SYNCED';
+
         setTimeout(() => {
           this.history.push([...this.boardState]);
           this.boardState = nextState;
           this.moveCount++;
           this.updateStats();
           this.isAnimating = false;
+          this.dom.slideRegisterStatus.textContent = 'SLIDE REGISTER: [READY]';
 
-          // Check win condition
           if (isSolved(this.boardState)) {
             this.isWon = true;
+            this.clearedLevels.add(this.currentLevelIndex);
             this.renderBoard();
             setTimeout(() => {
               playSound('win');
@@ -1703,31 +2529,29 @@
           cellEl.dataset.index = cell;
 
           if (val === 0) {
-            // Empty / blank slot
             const blankEl = document.createElement('div');
             blankEl.className = 'slot-blank';
-            blankEl.title = `Blank Slot (${cell})`;
+            const socketName = (cell === 0) ? 'SOCKET<br><strong>0 ALPHA</strong>' : (cell === 15) ? 'SOCKET<br><strong>0 BETA</strong>' : 'SOCKET<br><strong>EMPTY</strong>';
+            blankEl.innerHTML = `<span class="socket-reticle">⌖</span><span>${socketName}</span>`;
             cellEl.appendChild(blankEl);
 
-            // Clicking empty slot gives subtle bump
             blankEl.addEventListener('click', () => {
               if (!this.isAnimating) playSound('bump');
             });
           } else {
-            // Tile
             const tileEl = document.createElement('div');
             tileEl.className = 'tile';
             tileEl.dataset.cell = cell;
             tileEl.dataset.val = val;
 
+            const valStr = val < 10 ? '0' + val : '' + val;
             const numSpan = document.createElement('span');
             numSpan.className = 'tile-number';
-            numSpan.textContent = val;
+            numSpan.textContent = valStr;
             tileEl.appendChild(numSpan);
 
             const legalDirs = getLegalDirections(this.boardState, cell);
 
-            // Active hover and Partner ghost highlight sync
             if (this.hoveredCell !== null) {
               if (cell === this.hoveredCell) {
                 tileEl.classList.add('hover-active');
@@ -1737,10 +2561,8 @@
             }
 
             if (legalDirs.length === 1) {
-              // Exactly 1 legal move: One-click move
               tileEl.classList.add('movable');
               const singleDir = legalDirs[0];
-              tileEl.title = `Click to slide ${singleDir} (mirrored partner will also move)`;
 
               tileEl.addEventListener('mouseenter', () => {
                 this.hoveredCell = cell;
@@ -1758,9 +2580,7 @@
               });
 
             } else if (legalDirs.length > 1) {
-              // Dual-blank adjacency: Show two small directional arrows
-              tileEl.classList.add('dual-choice');
-              tileEl.title = `Touches both blanks! Choose an arrow direction or tap closer to blank.`;
+              tileEl.classList.add('movable');
 
               const arrowsBox = document.createElement('div');
               arrowsBox.className = 'dual-arrows-container';
@@ -1791,7 +2611,6 @@
                 this.refreshHighlights();
               });
 
-              // Allow clicking anywhere on the tile body: slides in the direction closest to the click point
               tileEl.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const rect = tileEl.getBoundingClientRect();
@@ -1810,10 +2629,9 @@
                 this.executeMove(cell, bestDir);
               });
             } else {
-              // Not movable: clicking triggers illegal bump feedback
               tileEl.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.executeMove(cell, 'up'); // Will trigger illegal move bump
+                this.executeMove(cell, 'up');
               });
             }
 
@@ -1837,53 +2655,120 @@
             }
           }
         });
+
+        if (this.hoveredCell !== null && this.boardState[this.hoveredCell] !== 0) {
+          const mCell = getMirrorCell(this.hoveredCell);
+          const v1 = this.boardState[this.hoveredCell];
+          const v2 = this.boardState[mCell];
+          const s1 = v1 < 10 ? '0' + v1 : '' + v1;
+          const s2 = v2 < 10 ? '0' + v2 : '' + v2;
+          this.dom.linkedPairDisplay.textContent = `TILE [${s1}] ⇄ TILE [${s2}]`;
+          this.dom.linkedPairStatusTag.textContent = 'LOCKED';
+        }
+      },
+
+      renderChamberCards() {
+        const container = this.dom.chambersGridContainer;
+        container.innerHTML = '';
+
+        const levels = window.LEVELS || [];
+        const clearedCount = this.clearedLevels.size;
+        const totalCount = levels.length;
+        const pct = Math.round((clearedCount / Math.max(1, totalCount)) * 100);
+
+        if (this.dom.sectorClearancePct) this.dom.sectorClearancePct.textContent = `${pct}%`;
+        if (this.dom.sectorProgressFill) this.dom.sectorProgressFill.style.width = `${Math.max(10, pct)}%`;
+
+        levels.forEach((lvl, idx) => {
+          const chamberNum = (idx + 1 < 10 ? '0' : '') + (idx + 1);
+          const par = lvl.optimal || (lvl.solution ? lvl.solution.length : 3);
+          const isCleared = this.clearedLevels.has(idx);
+          const isActive = (idx === this.currentLevelIndex);
+
+          const card = document.createElement('div');
+          card.className = `chamber-card reticle-box ${isActive ? 'active-chamber' : ''}`;
+          card.innerHTML = `
+            <div class="chamber-card-header">
+              <span class="chamber-card-badge">${isCleared ? 'CLEARED' : (isActive ? 'ACTIVE' : 'READY')}</span>
+              <span>★ 3/3</span>
+            </div>
+            <div class="chamber-card-num">${chamberNum}</div>
+            <div class="chamber-card-name">${lvl.name.replace(/^Level\s*\d+\s*[-:]*\s*/i, '').toUpperCase()}</div>
+            <div class="chamber-card-spec">TARGET: ${par} MV // MIRROR DUAL</div>
+            <div class="chamber-card-preview">
+              <svg class="preview-schematic-svg" viewBox="0 0 40 40">
+                <rect x="2" y="2" width="36" height="36" fill="none" stroke="#332B1E" stroke-width="1"/>
+                <line x1="2" y1="38" x2="38" y2="2" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="2,2"/>
+                <rect x="16" y="16" width="8" height="8" fill="#F59E0B" opacity="0.8"/>
+              </svg>
+            </div>
+            <div class="chamber-card-footer">
+              <span>${isCleared ? '↺ REPLAY' : (isActive ? 'ENTER [ENTER] ▶' : 'INGRESS ▶')}</span>
+            </div>
+          `;
+
+          card.addEventListener('click', () => {
+            this.currentLevelIndex = idx;
+            this.updateBriefingCard(idx);
+            this.startLevel(idx);
+          });
+
+          card.addEventListener('mouseenter', () => {
+            this.updateBriefingCard(idx);
+          });
+
+          container.appendChild(card);
+        });
+
+        this.updateBriefingCard(this.currentLevelIndex);
+      },
+
+      updateBriefingCard(idx) {
+        const lvl = window.LEVELS[idx] || window.LEVELS[0];
+        const chamberNum = (idx + 1 < 10 ? '0' : '') + (idx + 1);
+        if (this.dom.briefingHeaderTag) {
+          this.dom.briefingHeaderTag.textContent = `■ ACTIVE CHAMBER BRIEFING :: CHAMBER ${chamberNum}`;
+        }
+        if (this.dom.briefingTitleText) {
+          this.dom.briefingTitleText.textContent = `${lvl.name.replace(/^Level\s*\d+\s*[-:]*\s*/i, '').toUpperCase()} - MECHANICS`;
+        }
+        if (this.dom.briefingDescText) {
+          this.dom.briefingDescText.textContent = lvl.hint || "Dual optical rails active. Position mirror nodes along the primary diagonal vectors.";
+        }
       },
 
       showWinModal() {
         const lvl = window.LEVELS[this.currentLevelIndex];
-        const par = lvl.optimal || (lvl.solution ? lvl.solution.length : null);
-        this.dom.winLevelName.textContent = lvl.name;
-        this.dom.winMovesCount.textContent = this.moveCount;
+        const par = lvl.optimal || (lvl.solution ? lvl.solution.length : 3);
+        const chamberNum = (this.currentLevelIndex + 1 < 10 ? '0' : '') + (this.currentLevelIndex + 1);
 
-        if (this.dom.winParCount) {
-          this.dom.winParCount.textContent = par !== null ? par : '-';
-        }
+        this.dom.winLevelName.textContent = `CHAMBER ${chamberNum}: ${lvl.name.replace(/^Level\s*\d+\s*[-:]*\s*/i, '').toUpperCase()}`;
+        const movesStr = this.moveCount < 10 ? '0' + this.moveCount : '' + this.moveCount;
+        const parStr = par < 10 ? '0' + par : '' + par;
 
-        // Compute performance and celebratory one-line message
-        let oneLiner = '';
+        this.dom.winMovesCount.textContent = movesStr;
+        this.dom.winParCount.textContent = parStr;
+
+        const diff = this.moveCount - par;
+        let rankStr = 'CALIBRATION: S-RANK [FLAWLESS] ★★★';
+        let msg = '★ SPECULAR MATRIX HARMONIZED! OPTICAL CORE STABILIZED ★';
+
         if (this.currentLevelIndex === window.LEVELS.length - 1) {
-          oneLiner = '👑 GRAND CHAMPION! You conquered all mirror dimensions!';
-        } else if (par !== null) {
-          const diff = this.moveCount - par;
-          if (diff <= 0) {
-            oneLiner = '★ FLAWLESS REFLECTION! Optimal solution matched! ★';
-          } else if (diff === 1) {
-            oneLiner = '★ SO CLOSE! Just 1 step above par! ★';
-          } else if (diff <= 3) {
-            oneLiner = '★ GREAT JOB! Can you trim it down to par? ★';
-          } else {
-            oneLiner = '★ SOLVED! Reflection puzzle conquered! ★';
-          }
-        } else {
-          oneLiner = '★ SOLVED! Reflection puzzle conquered! ★';
+          rankStr = 'RANK: GRAND MASTER // ALL CORES HARMONIZED';
+          msg = '👑 ALL OPTICAL CHAMBERS CALIBRATED! SECTOR CLEARANCE 100% 👑';
+        } else if (diff === 1) {
+          rankStr = 'CALIBRATION: A-RANK [NEAR OPTIMAL] ★★☆';
+          msg = '★ OPTICAL BEAM STABILIZED! JUST 1 STEP ABOVE PAR ★';
+        } else if (diff > 1) {
+          rankStr = 'CALIBRATION: B-RANK [CALIBRATED] ★☆☆';
+          msg = '★ CHAMBER CLEARED! REFLECTION MATRIX COMPLETE ★';
         }
 
-        if (this.dom.winMessage) {
-          this.dom.winMessage.textContent = oneLiner;
-        }
+        this.dom.winEfficiencyRank.textContent = rankStr;
+        this.dom.winMessage.textContent = msg;
 
-        if (this.dom.winParSummary) {
-          if (par !== null) {
-            let parMsg = (this.moveCount <= par) ? '★ Optimal par achieved!' : `Par is ${par} moves.`;
-            this.dom.winParSummary.textContent = parMsg;
-          } else {
-            this.dom.winParSummary.textContent = '';
-          }
-        }
-
-        // Hide "Next Level" button if on last level
         const hasNext = (this.currentLevelIndex + 1 < window.LEVELS.length);
-        this.dom.btnNextLevel.style.display = hasNext ? 'inline-flex' : 'none';
+        this.dom.btnNextLevel.style.display = hasNext ? 'block' : 'none';
 
         this.dom.winModal.classList.add('active');
       },
@@ -1892,75 +2777,22 @@
         this.dom.winModal.classList.remove('active');
       },
 
-      openTutorialModal() {
+      openManualModal() {
         this.dom.tutorialModal.classList.add('active');
       },
 
-      closeTutorialModal() {
+      closeManualModal() {
         this.dom.tutorialModal.classList.remove('active');
-      },
-
-      openLevelsModal() {
-        this.renderModalLevels();
-        this.dom.levelsModal.classList.add('active');
-      },
-
-      closeLevelsModal() {
-        this.dom.levelsModal.classList.remove('active');
-      },
-
-      renderStartScreenLevels() {
-        const container = this.dom.startLevelList;
-        container.innerHTML = '';
-        window.LEVELS.forEach((lvl, idx) => {
-          const par = lvl.optimal || (lvl.solution ? lvl.solution.length : '-');
-          const card = document.createElement('div');
-          card.className = `level-card-btn ${idx === this.currentLevelIndex ? 'current' : ''}`;
-          card.innerHTML = `
-            <div class="level-card-header">
-              <span class="level-card-title">${lvl.name}</span>
-              <span class="level-card-par">PAR: ${par}</span>
-            </div>
-            <div class="level-card-hint">${lvl.hint}</div>
-          `;
-          card.addEventListener('click', () => {
-            this.startLevel(idx);
-          });
-          container.appendChild(card);
-        });
-      },
-
-      renderModalLevels() {
-        const container = this.dom.modalLevelList;
-        container.innerHTML = '';
-        window.LEVELS.forEach((lvl, idx) => {
-          const par = lvl.optimal || (lvl.solution ? lvl.solution.length : '-');
-          const card = document.createElement('div');
-          card.className = `level-card-btn ${idx === this.currentLevelIndex ? 'current' : ''}`;
-          card.innerHTML = `
-            <div class="level-card-header">
-              <span class="level-card-title">${lvl.name}</span>
-              <span class="level-card-par">PAR: ${par}</span>
-            </div>
-            <div class="level-card-hint">${lvl.hint}</div>
-          `;
-          card.addEventListener('click', () => {
-            this.closeLevelsModal();
-            this.startLevel(idx);
-          });
-          container.appendChild(card);
-        });
       }
     };
 
     /**
      * Self-test function callable from browser console: runSelfTest()
      * Replays every level's stored solution using applyMove() and checks that the final state is solved.
-     * Logs PASS/FAIL per level.
      */
     function runSelfTest() {
       const levels = (typeof window !== 'undefined' && window.LEVELS) ? window.LEVELS : (typeof LEVELS !== 'undefined' ? LEVELS : []);
-      console.log(`%c=== RUNNING MIRROR SLIDE SELF-TEST (${levels.length} LEVELS) ===`, 'font-weight: bold; color: #0D1F3C; font-size: 12px;');
+      console.log(`%c=== RUNNING OPTICAL CORE SELF-TEST (${levels.length} CHAMBERS) ===`, 'font-weight: bold; color: #F59E0B; font-size: 12px;');
 
       let passedCount = 0;
       const results = [];
@@ -1981,7 +2813,7 @@
             const nextState = applyMove(state, cell, dir);
             if (!nextState) {
               failed = true;
-              failureReason = `Illegal move at step ${step + 1}: [cell: ${cell}, dir: "${dir}"]. Tile value was ${state[cell]}. State: ${JSON.stringify(state)}`;
+              failureReason = `Illegal move at step ${step + 1}: [cell: ${cell}, dir: "${dir}"].`;
               break;
             }
             state = nextState;
@@ -1989,15 +2821,15 @@
 
           if (!failed && !isSolved(state)) {
             failed = true;
-            failureReason = `All ${moves.length} moves executed, but board is not in solved state: ${JSON.stringify(state)}`;
+            failureReason = `Moves executed, but final board state is not solved.`;
           }
         }
 
         if (failed) {
-          console.error(`%c[FAIL] Level ${levelNum}: ${lvl.name} - ${failureReason}`, 'color: #DC2626; font-weight: bold;');
+          console.error(`[FAIL] Chamber ${levelNum}: ${lvl.name} - ${failureReason}`);
           results.push({ level: levelNum, name: lvl.name, status: 'FAIL', reason: failureReason });
         } else {
-          console.log(`%c[PASS] Level ${levelNum}: ${lvl.name} (${moves.length} moves, Par: ${lvl.optimal || moves.length}) -> Solved!`, 'color: #15803D; font-weight: bold;');
+          console.log(`[PASS] Chamber ${levelNum}: ${lvl.name} (${moves.length} moves, Par: ${lvl.optimal || moves.length}) -> Solved!`);
           passedCount++;
           results.push({ level: levelNum, name: lvl.name, status: 'PASS', moves: moves.length, par: lvl.optimal });
         }
@@ -2005,24 +2837,16 @@
 
       const allPassed = (passedCount === levels.length);
       if (allPassed) {
-        console.log(`%c✓ ALL ${passedCount}/${levels.length} LEVELS PASSED! (Both JS and Python rules agree 100%)`, 'color: #15803D; font-weight: bold; font-size: 13px;');
-      } else {
-        console.warn(`%c⚠ SELF-TEST: ${passedCount}/${levels.length} PASSED, ${levels.length - passedCount} FAILED`, 'color: #DC2626; font-weight: bold; font-size: 13px;');
+        console.log(`✓ ALL ${passedCount}/${levels.length} CHAMBERS PASSED!`);
       }
 
-      return {
-        allPassed,
-        passedCount,
-        total: levels.length,
-        results
-      };
+      return { allPassed, passedCount, total: levels.length, results };
     }
 
     if (typeof window !== 'undefined') {
       window.runSelfTest = runSelfTest;
     }
 
-    // Initialize game on page load
     window.addEventListener('DOMContentLoaded', () => {
       Game.init();
     });
