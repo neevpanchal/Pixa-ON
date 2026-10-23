@@ -107,6 +107,14 @@
 
 ---
 
+### Prompt 10: Reflected Title 'S' Font Fix
+> *"The S in the mirror slide below the mirror slide is small. Please look after that and make it better."*
+
+- Replaced Unicode fallback character `Ƨ` with standard ASCII `SLIDE` paired with pure CSS vertical reflection (`transform: scaleY(-1)` and `display: inline-block`).
+- Confirmed that all letters in the reflected logo render in full-sized 42px pixel font matching the letters above it.
+
+---
+
 ## When AI Got It Wrong & How It Was Resolved
 
 ### 1. Browser Subagent Sandbox Dependency & Network Block
@@ -136,3 +144,7 @@
 ### 7. Diagonal Mirror Axis Overlay Obscuring Grid Numbers
 - **Issue**: Faithfully transcribing the Stitch design mockup included a literal diagonal dashed axis line and a rotated badge (`--- MIRROR AXIS 45° ---`) across the center of the 4x4 matrix. In active gameplay, this badge physically covered tiles `06`, `07`, `09`, and `10`, making their numbers difficult to read.
 - **Correction**: Removed the overlapping diagonal axis SVG and badge from the playable puzzle matrix so all 14 tile numbers are 100% visible and unobstructed, while preserving the concept cleanly in the left telemetry schematic panel and the technical manual.
+
+### 8. Reflected 'S' Font Fallback Glitch on Title Screen
+- **Issue**: The reflected title text underneath the laser divider was initially written using a special Unicode character `Ƨ` (`<div class="title-word-slide-reflected">ƧΓIDE</div>`). Because `'Press Start 2P'` does not contain the `Ƨ` glyph, the browser fell back to a default system font, making the `S` appear tiny, serif, and mismatched with the giant pixel letters next to it.
+- **Correction**: Replaced `ƧΓIDE` with standard ASCII `SLIDE` rendered inside `.title-word-slide-reflected` with `transform: scaleY(-1)` and `display: inline-block`. This allows `'Press Start 2P'` to render every letter (`S`, `L`, `I`, `D`, `E`) in its native 42px pixel font, producing a vertically inverted optical reflection where the `S` matches the size and aesthetic of the word above it.
