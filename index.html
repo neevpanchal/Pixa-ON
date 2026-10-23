@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Mirror Slide - Mirrored Sliding Tile Puzzle</title>
   
   <!-- Retro Pixel Font -->
@@ -26,6 +26,7 @@
       --gold-light: #FEF3C7;
       --slot-empty: #E5DEC9;
       --border-width: 3px;
+      --board-gap: 8px;
       --shadow-sm: 2px 2px 0px var(--navy);
       --shadow-md: 4px 4px 0px var(--navy);
       --shadow-lg: 6px 6px 0px var(--navy);
@@ -38,6 +39,7 @@
       padding: 0;
       user-select: none;
       -webkit-user-select: none;
+      touch-action: manipulation;
     }
 
     body {
@@ -51,8 +53,9 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 14px 10px;
       line-height: 1.5;
+      overflow-x: hidden;
     }
 
     /* Screen containers */
@@ -86,6 +89,7 @@
       justify-content: center;
       gap: 6px;
       transition: transform 0.05s ease, box-shadow 0.05s ease;
+      touch-action: manipulation;
     }
 
     .btn:hover {
@@ -116,8 +120,8 @@
     }
 
     .btn-lg {
-      font-size: 13px;
-      padding: 15px 24px;
+      font-size: 12px;
+      padding: 14px 20px;
       box-shadow: var(--shadow-lg);
     }
 
@@ -147,11 +151,12 @@
       background-color: var(--tile-bg);
       border: var(--border-width) solid var(--navy);
       box-shadow: var(--shadow-md);
-      padding: 16px;
-      margin: 14px 0 20px 0;
-      font-size: 10.5px;
+      padding: 14px 16px;
+      margin: 12px 0 16px 0;
+      font-size: 10px;
       line-height: 1.8;
       text-align: center;
+      width: 100%;
     }
 
     .menu-box {
@@ -159,27 +164,37 @@
       background-color: var(--board-bg);
       border: 4px solid var(--navy);
       box-shadow: var(--shadow-lg);
-      padding: 22px 18px;
-      margin-bottom: 16px;
+      padding: 18px 16px;
+      margin-bottom: 14px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
+    }
+
+    .menu-actions-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .menu-actions-row .btn {
+      flex: 1;
     }
 
     .level-select-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 10px;
+      gap: 8px;
       width: 100%;
     }
 
     .level-card-btn {
       width: 100%;
       text-align: left;
-      padding: 12px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
       background-color: var(--tile-bg);
       border: var(--border-width) solid var(--navy);
       box-shadow: var(--shadow-sm);
@@ -206,7 +221,7 @@
     }
 
     .level-card-title {
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: bold;
       color: var(--navy);
     }
@@ -216,13 +231,13 @@
       background-color: var(--gold-light);
       color: var(--gold-dark);
       border: 1px solid var(--navy);
-      padding: 2px 6px;
+      padding: 2px 5px;
       font-weight: bold;
       white-space: nowrap;
     }
 
     .level-card-hint {
-      font-size: 8.5px;
+      font-size: 8px;
       line-height: 1.4;
       color: var(--navy-light);
     }
@@ -233,7 +248,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      gap: 8px;
+      margin-bottom: 10px;
     }
 
     .level-badge {
@@ -243,6 +259,13 @@
       box-shadow: var(--shadow-sm);
       padding: 6px 10px;
       font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .sound-toggle-btn {
+      padding: 6px 10px;
+      font-size: 9px;
+      min-width: 72px;
     }
 
     .stats-bar {
@@ -253,16 +276,16 @@
       background-color: var(--tile-bg);
       border: var(--border-width) solid var(--navy);
       box-shadow: var(--shadow-sm);
-      padding: 10px 14px;
-      margin-bottom: 12px;
-      font-size: 11px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
+      font-size: 10.5px;
     }
 
     .stat-moves {
       font-weight: bold;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
 
     .stat-moves span {
@@ -273,8 +296,8 @@
       font-weight: bold;
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 10px;
+      gap: 5px;
+      font-size: 9.5px;
     }
 
     .stat-par span {
@@ -290,7 +313,7 @@
       padding: 8px 10px;
       font-size: 8.5px;
       line-height: 1.5;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       text-align: left;
       display: flex;
       align-items: flex-start;
@@ -319,7 +342,7 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       grid-template-rows: repeat(4, 1fr);
-      gap: 8px;
+      gap: var(--board-gap);
       width: 100%;
       height: 100%;
     }
@@ -378,7 +401,8 @@
       color: var(--navy);
       cursor: default;
       position: relative;
-      transition: transform 0.08s ease, box-shadow 0.08s ease;
+      touch-action: manipulation;
+      transition: transform 120ms cubic-bezier(0.2, 0, 0.2, 1), box-shadow 120ms ease;
     }
 
     .tile-number {
@@ -391,17 +415,88 @@
       cursor: pointer;
     }
 
-    .tile.movable:hover {
+    .tile.movable:hover,
+    .tile.hover-active {
       background-color: var(--tile-hover);
       border-color: var(--navy);
       transform: translate(-2px, -2px);
       box-shadow: var(--shadow-md);
     }
 
-    /* Partner Highlight on Hover */
-    .tile.partner-highlight {
-      border: 3px solid var(--gold-dark);
-      background-color: #FEF3C7;
+    /* ==========================================================================
+       SUBTLE GHOST HIGHLIGHT ON MIRRORED TILE (SO PLAYER SEES THE TWIST)
+       ========================================================================== */
+    .tile.partner-ghost {
+      border: 3px dashed var(--gold-dark) !important;
+      background-color: #FEF3C7 !important;
+      box-shadow: 0 0 10px rgba(217, 119, 6, 0.6), var(--shadow-sm) !important;
+      animation: ghostPulse 1.2s infinite ease-in-out;
+    }
+
+    .tile.partner-ghost::after {
+      content: 'MIRROR';
+      position: absolute;
+      bottom: 2px;
+      right: 3px;
+      font-size: 6px;
+      color: var(--gold-dark);
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+    }
+
+    @keyframes ghostPulse {
+      0%, 100% {
+        box-shadow: 0 0 6px rgba(217, 119, 6, 0.4), var(--shadow-sm);
+      }
+      50% {
+        box-shadow: 0 0 12px rgba(217, 119, 6, 0.8), var(--shadow-sm);
+      }
+    }
+
+    /* ==========================================================================
+       SMOOTH TILE SLIDE ANIMATION (~120ms) & GHOST SLIDE
+       ========================================================================== */
+    .tile.sliding-up {
+      transform: translateY(calc(-100% - var(--board-gap, 8px))) !important;
+      z-index: 10;
+    }
+    .tile.sliding-down {
+      transform: translateY(calc(100% + var(--board-gap, 8px))) !important;
+      z-index: 10;
+    }
+    .tile.sliding-left {
+      transform: translateX(calc(-100% - var(--board-gap, 8px))) !important;
+      z-index: 10;
+    }
+    .tile.sliding-right {
+      transform: translateX(calc(100% + var(--board-gap, 8px))) !important;
+      z-index: 10;
+    }
+
+    /* Ghost highlight while the mirrored tile is sliding */
+    .tile.ghost-slide {
+      border-style: dashed !important;
+      border-color: var(--gold-dark) !important;
+      background-color: #FEF3C7 !important;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.75), var(--shadow-sm) !important;
+    }
+
+    /* ==========================================================================
+       BUMP SHAKE ANIMATION FOR ILLEGAL MOVES
+       ========================================================================== */
+    @keyframes tileBump {
+      0%, 100% { transform: translate(0, 0); }
+      20% { transform: translate(-4px, 0); }
+      40% { transform: translate(4px, 0); }
+      60% { transform: translate(-3px, 0); }
+      80% { transform: translate(2px, 0); }
+    }
+
+    .tile.tile-bump {
+      animation: tileBump 0.2s ease-in-out;
+      border-color: #DC2626 !important;
+      box-shadow: 0 0 6px rgba(220, 38, 38, 0.6), var(--shadow-sm) !important;
     }
 
     /* Dual-Direction Tile (adjacent to both blanks) */
@@ -480,9 +575,9 @@
     /* Controls Bar */
     .game-controls {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       width: 100%;
-      margin-top: 18px;
+      margin-top: 14px;
       justify-content: space-between;
     }
 
@@ -494,23 +589,24 @@
 
     /* Instruction Footnote */
     .rules-footnote {
-      margin-top: 14px;
-      font-size: 8.5px;
+      margin-top: 12px;
+      font-size: 8px;
       color: var(--navy-light);
       line-height: 1.5;
       text-align: center;
     }
 
-    /* Modals & Overlays (Win Screen & Level Select) */
+    /* Modals & Overlays (Win Screen, How to Play, Level Select) */
     .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background-color: rgba(13, 31, 60, 0.75);
+      background-color: rgba(13, 31, 60, 0.78);
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 14px;
       z-index: 100;
+      overflow-y: auto;
     }
 
     .modal-overlay.active {
@@ -521,23 +617,25 @@
       background-color: var(--bg-cream);
       border: 4px solid var(--navy);
       box-shadow: var(--shadow-xl);
-      padding: 24px 20px;
+      padding: 22px 18px;
       max-width: 440px;
       width: 100%;
       text-align: center;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       animation: modalPop 0.12s ease-out;
+      max-height: 92vh;
+      overflow-y: auto;
     }
 
     @keyframes modalPop {
-      0% { transform: scale(0.9); opacity: 0; }
+      0% { transform: scale(0.92); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
 
     .win-title {
-      font-size: 16px;
+      font-size: 15px;
       color: var(--navy);
       display: flex;
       align-items: center;
@@ -546,43 +644,265 @@
     }
 
     .win-moves-summary {
-      font-size: 11px;
+      font-size: 10.5px;
       background-color: var(--tile-bg);
       border: var(--border-width) solid var(--navy);
       box-shadow: var(--shadow-sm);
-      padding: 14px;
+      padding: 14px 12px;
       line-height: 1.6;
     }
 
-    .win-par-summary {
-      font-size: 9px;
-      margin-top: 6px;
+    .win-score-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 8px 0;
+    }
+
+    .score-pill {
+      background-color: var(--board-bg);
+      border: 2px solid var(--navy);
+      padding: 6px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 80px;
+    }
+
+    .score-label {
+      font-size: 8px;
       color: var(--navy-light);
+      font-weight: bold;
+    }
+
+    .score-val {
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--navy);
+    }
+
+    .score-divider {
+      font-size: 10px;
+      font-weight: bold;
+      color: var(--navy-light);
+    }
+
+    .win-one-liner {
+      margin-top: 10px;
+      font-size: 9px;
+      font-weight: bold;
+      color: var(--navy);
+      padding: 8px 6px;
+      background-color: var(--gold-light);
+      border: 2px dashed var(--navy);
+      line-height: 1.5;
     }
 
     .modal-buttons {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       width: 100%;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
-    /* Audio Mute Icon */
-    .sound-toggle-btn {
-      padding: 6px 10px;
-      font-size: 9px;
+    /* ==========================================================================
+       HOW TO PLAY OVERLAY ANIMATED EXAMPLE
+       ========================================================================== */
+    .mini-demo-wrapper {
+      background-color: var(--board-bg);
+      border: 3px solid var(--navy);
+      box-shadow: var(--shadow-sm);
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
     }
 
-    /* Responsive Adjustments */
-    @media (max-width: 420px) {
-      .game-logo { font-size: 20px; }
-      .tile { font-size: 15px; }
-      .tile.dual-choice .tile-number { font-size: 13px; }
-      .board-frame { padding: 8px; }
-      .board-grid { gap: 6px; }
-      .direction-arrow-btn { width: 20px; height: 20px; font-size: 9px; }
-      .btn { font-size: 8.5px; padding: 8px 6px; }
+    .mini-demo-title {
+      font-size: 8.5px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+
+    .mini-demo-board {
+      display: grid;
+      grid-template-columns: repeat(4, 38px);
+      grid-template-rows: 38px;
+      gap: 6px;
+      background-color: var(--board-bg);
+      padding: 6px;
+      border: 2px solid var(--navy);
+    }
+
+    .mini-cell {
+      position: relative;
+      width: 38px;
+      height: 38px;
+    }
+
+    .mini-slot-blank {
+      width: 100%;
+      height: 100%;
+      background-color: var(--slot-empty);
+      border: 2px dashed var(--navy);
+      box-sizing: border-box;
+    }
+
+    .mini-tile {
+      width: 100%;
+      height: 100%;
+      background-color: var(--tile-bg);
+      border: 2px solid var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: bold;
+      box-shadow: 2px 2px 0px var(--navy);
+    }
+
+    .mini-tile-player {
+      animation: miniSlidePlayer 2.4s infinite ease-in-out;
+    }
+
+    .mini-tile-mirror {
+      border: 2px dashed var(--gold-dark);
+      background-color: #FEF3C7;
+      box-shadow: 0 0 6px rgba(217, 119, 6, 0.4), 2px 2px 0px var(--navy);
+      animation: miniSlideMirror 2.4s infinite ease-in-out;
+    }
+
+    @keyframes miniSlidePlayer {
+      0%, 15% { transform: translateX(0); }
+      40%, 65% { transform: translateX(44px); } /* 38px + 6px gap */
+      85%, 100% { transform: translateX(0); }
+    }
+
+    @keyframes miniSlideMirror {
+      0%, 15% { transform: translateX(0); }
+      40%, 65% { transform: translateX(-44px); }
+      85%, 100% { transform: translateX(0); }
+    }
+
+    .mini-demo-labels {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 196px;
+      font-size: 7px;
+      font-weight: bold;
+    }
+
+    .mini-label-player { color: var(--navy); }
+    .mini-label-mirror { color: var(--gold-dark); }
+
+    .tutorial-rules-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: left;
+      font-size: 8.5px;
+      line-height: 1.6;
+    }
+
+    .tutorial-rule-item {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .tutorial-rule-item .rule-icon {
+      font-weight: bold;
+      color: var(--gold-dark);
+      min-width: 14px;
+    }
+
+    /* ==========================================================================
+       MOBILE-FRIENDLY RESPONSIVE ADJUSTMENTS
+       ========================================================================== */
+    @media (max-width: 480px) {
+      :root {
+        --board-gap: 6px;
+      }
+      body {
+        padding: 8px 6px;
+      }
+      .game-logo {
+        font-size: 20px;
+      }
+      .subtitle-card {
+        font-size: 9px;
+        padding: 10px 12px;
+        margin: 8px 0 12px 0;
+      }
+      .board-frame {
+        max-width: 95vw;
+        padding: 8px;
+      }
+      .tile {
+        font-size: 15px;
+      }
+      .tile.dual-choice .tile-number {
+        font-size: 13px;
+      }
+      .direction-arrow-btn {
+        width: 22px;
+        height: 22px;
+        font-size: 9px;
+      }
+      .btn {
+        font-size: 8.5px;
+        padding: 10px 6px;
+        min-height: 40px;
+      }
+      .sound-toggle-btn {
+        min-width: 60px;
+        padding: 6px 6px;
+      }
+      .game-controls {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .game-controls .btn {
+        flex: 1 1 calc(50% - 6px);
+      }
+      .stats-bar {
+        font-size: 9.5px;
+        padding: 8px 10px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .game-logo {
+        font-size: 17px;
+      }
+      .tile {
+        font-size: 13px;
+      }
+      .board-frame {
+        padding: 6px;
+      }
+      .mini-demo-board {
+        grid-template-columns: repeat(4, 30px);
+        grid-template-rows: 30px;
+      }
+      .mini-cell {
+        width: 30px;
+        height: 30px;
+      }
+      @keyframes miniSlidePlayer {
+        0%, 15% { transform: translateX(0); }
+        40%, 65% { transform: translateX(36px); }
+        85%, 100% { transform: translateX(0); }
+      }
+      @keyframes miniSlideMirror {
+        0%, 15% { transform: translateX(0); }
+        40%, 65% { transform: translateX(-36px); }
+        85%, 100% { transform: translateX(0); }
+      }
     }
   </style>
 </head>
@@ -601,11 +921,16 @@
     </div>
 
     <div class="menu-box">
-      <button id="btn-main-play" class="btn btn-gold btn-lg">
-        ▶ PLAY GAME
-      </button>
+      <div class="menu-actions-row">
+        <button id="btn-main-play" class="btn btn-gold btn-lg">
+          ▶ PLAY GAME
+        </button>
+        <button id="btn-start-how-to-play" class="btn btn-lg" title="How to play instructions">
+          ❓ HOW TO PLAY
+        </button>
+      </div>
 
-      <div style="font-size: 10px; font-weight: bold; margin-top: 8px; text-align: left; text-transform: uppercase;">
+      <div style="font-size: 10px; font-weight: bold; margin-top: 6px; text-align: left; text-transform: uppercase;">
         SELECT LEVEL:
       </div>
 
@@ -629,6 +954,9 @@
       <div id="current-level-badge" class="level-badge">
         LEVEL 1
       </div>
+      <button id="btn-game-how-to-play" class="btn" title="How to play overlay">
+        ❓ HELP
+      </button>
       <button id="btn-sound-toggle" class="btn sound-toggle-btn" title="Toggle sound">
         🔊 ON
       </button>
@@ -688,9 +1016,22 @@
       </div>
 
       <div class="win-moves-summary">
-        <div id="win-level-name" style="font-weight: bold; margin-bottom: 6px;">Level 1</div>
-        <div>Completed in <span id="win-moves-count" class="gold-accent-text" style="font-weight: bold;">0</span> moves!</div>
-        <div id="win-par-summary" class="win-par-summary">Par: - moves</div>
+        <div id="win-level-name" style="font-weight: bold; margin-bottom: 8px; font-size: 11px;">Level 1</div>
+        <div class="win-score-box">
+          <div class="score-pill">
+            <span class="score-label">MOVES</span>
+            <span id="win-moves-count" class="score-val gold-accent-text">0</span>
+          </div>
+          <div class="score-divider">VS</div>
+          <div class="score-pill">
+            <span class="score-label">PAR</span>
+            <span id="win-par-count" class="score-val">0</span>
+          </div>
+        </div>
+        <div id="win-par-summary" class="win-par-summary"></div>
+        <div id="win-message" class="win-one-liner">
+          ★ FLAWLESS! You matched par! ★
+        </div>
       </div>
 
       <div class="modal-buttons">
@@ -707,7 +1048,56 @@
     </div>
   </div>
 
-  <!-- ==================== 4. LEVEL SELECT MODAL ==================== -->
+  <!-- ==================== 4. HOW TO PLAY OVERLAY ==================== -->
+  <div id="tutorial-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
+    <div class="modal-card">
+      <div id="tutorial-title" class="win-title" style="font-size: 13px;">
+        <span class="gold-accent-text">🪞</span>
+        <span>HOW TO PLAY</span>
+        <span class="gold-accent-text">🪞</span>
+      </div>
+
+      <!-- Animated Mini-Demo -->
+      <div class="mini-demo-wrapper">
+        <div class="mini-demo-title">MIRROR MOVEMENT DEMO</div>
+        <div class="mini-demo-board">
+          <div class="mini-cell">
+            <div class="mini-tile mini-tile-player">1</div>
+          </div>
+          <div class="mini-cell mini-slot-blank"></div>
+          <div class="mini-cell mini-slot-blank"></div>
+          <div class="mini-cell">
+            <div class="mini-tile mini-tile-mirror">14</div>
+          </div>
+        </div>
+        <div class="mini-demo-labels">
+          <span class="mini-label-player">YOU SLIDE ▶</span>
+          <span class="mini-label-mirror">◀ TWIN REVERSES</span>
+        </div>
+      </div>
+
+      <div class="tutorial-rules-list">
+        <div class="tutorial-rule-item">
+          <span class="rule-icon">1.</span>
+          <span><strong>The Goal:</strong> Order tiles <strong>1 to 14</strong> in reading order. Leave the top-left (★) and bottom-right (★) corners empty.</span>
+        </div>
+        <div class="tutorial-rule-item">
+          <span class="rule-icon">2.</span>
+          <span><strong>The Twist:</strong> Every move mirrors! When you slide a tile, its opposite twin slides across the board in reverse.</span>
+        </div>
+        <div class="tutorial-rule-item">
+          <span class="rule-icon">3.</span>
+          <span><strong>Mirror Ghost:</strong> Hover over any tile to preview its glowing gold mirror partner!</span>
+        </div>
+      </div>
+
+      <button id="btn-close-tutorial" class="btn btn-gold btn-lg" style="width: 100%;">
+        GOT IT! LET'S PLAY ▶
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== 5. LEVEL SELECT MODAL ==================== -->
   <div id="levels-modal" class="modal-overlay" role="dialog" aria-modal="true">
     <div class="modal-card">
       <div style="font-size: 13px; font-weight: bold;">
@@ -775,45 +1165,36 @@
      * @returns {Array<number>|null} - Cloned new board array or null if move is illegal
      */
     function applyMove(state, tileCell, direction) {
-      // Validate inputs
       if (!Array.isArray(state) || state.length !== 16) return null;
       if (typeof tileCell !== 'number' || tileCell < 0 || tileCell >= 16) return null;
-      if (state[tileCell] === 0) return null; // Can't move an empty blank
+      if (state[tileCell] === 0) return null;
 
       const dirObj = typeof direction === 'string' ? DIRS[direction.toLowerCase()] : direction;
       if (!dirObj || typeof dirObj.dr !== 'number' || typeof dirObj.dc !== 'number') return null;
 
-      // Coordinates of tile 1
       const r1 = Math.floor(tileCell / 4);
       const c1 = tileCell % 4;
 
       const targetR1 = r1 + dirObj.dr;
       const targetC1 = c1 + dirObj.dc;
 
-      // Check bounds
       if (targetR1 < 0 || targetR1 >= 4 || targetC1 < 0 || targetC1 >= 4) return null;
       const targetIdx1 = targetR1 * 4 + targetC1;
 
-      // Target 1 must be blank
       if (state[targetIdx1] !== 0) return null;
 
-      // Mirrored coordinates (point symmetry: r2 = 3 - r1, c2 = 3 - c1)
       const r2 = 3 - r1;
       const c2 = 3 - c1;
       const tileCell2 = r2 * 4 + c2;
 
-      // Mirrored move direction is inverted: (-dr, -dc)
       const targetR2 = r2 - dirObj.dr;
       const targetC2 = c2 - dirObj.dc;
 
-      // Bounds check for mirrored tile
       if (targetR2 < 0 || targetR2 >= 4 || targetC2 < 0 || targetC2 >= 4) return null;
       const targetIdx2 = targetR2 * 4 + targetC2;
 
-      // Mirrored target must also be blank
       if (state[targetIdx2] !== 0) return null;
 
-      // Construct pure new state copy
       const nextState = [...state];
       nextState[targetIdx1] = state[tileCell];
       nextState[tileCell] = 0;
@@ -859,11 +1240,23 @@
     }
 
     /* ==========================================================================
-       SYNTHESIZED 8-BIT RETRO AUDIO (WEB AUDIO API - ZERO EXTERNAL ASSETS)
+       SYNTHESIZED RETRO AUDIO (WEB AUDIO API - ZERO EXTERNAL ASSETS)
+       - Tile click
+       - Mirror "ping"
+       - Win jingle
+       - Bump for illegal moves
+       - Persistent mute button
        ========================================================================== */
 
     let audioCtx = null;
     let isSoundMuted = false;
+
+    // Load initial mute state from localStorage
+    try {
+      if (typeof localStorage !== 'undefined') {
+        isSoundMuted = localStorage.getItem('mirror_slide_sound_muted') === 'true';
+      }
+    } catch (e) {}
 
     function getAudioContext() {
       if (!audioCtx) {
@@ -885,51 +1278,87 @@
         if (!ctx) return;
         const now = ctx.currentTime;
 
-        if (type === 'slide') {
-          // Retro slide blip
+        if (type === 'tile-click' || type === 'slide') {
+          // Tactile tile click / tap (crisp retro damped triangle)
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(640, now);
+          osc.frequency.exponentialRampToValueAtTime(160, now + 0.038);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.038);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.04);
+
+        } else if (type === 'mirror-ping') {
+          // Resonant celestial mirror "ping"
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1480, now);
+          osc.frequency.exponentialRampToValueAtTime(1180, now + 0.18);
+          gain.gain.setValueAtTime(0.09, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.19);
+
+        } else if (type === 'bump') {
+          // Low hollow thud / bump for illegal moves
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'square';
-          osc.frequency.setValueAtTime(260, now);
-          osc.frequency.exponentialRampToValueAtTime(420, now + 0.08);
+          osc.frequency.setValueAtTime(110, now);
+          osc.frequency.exponentialRampToValueAtTime(45, now + 0.09);
+          gain.gain.setValueAtTime(0.14, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.1);
+
+        } else if (type === 'win') {
+          // Upbeat celebratory victory arpeggio: C5, E5, G5, B5, C6
+          const notes = [
+            { f: 523.25, t: 0.00, d: 0.11 },
+            { f: 659.25, t: 0.10, d: 0.11 },
+            { f: 783.99, t: 0.20, d: 0.11 },
+            { f: 987.77, t: 0.30, d: 0.13 },
+            { f: 1046.50, t: 0.42, d: 0.35 }
+          ];
+          notes.forEach(({ f, t, d }) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const start = now + t;
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, start);
+            gain.gain.setValueAtTime(0.16, start);
+            gain.gain.exponentialRampToValueAtTime(0.001, start + d);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(start);
+            osc.stop(start + d + 0.02);
+          });
+
+        } else if (type === 'undo') {
+          // Short rewind chirp
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.exponentialRampToValueAtTime(160, now + 0.08);
           gain.gain.setValueAtTime(0.08, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
           osc.connect(gain);
           gain.connect(ctx.destination);
           osc.start(now);
-          osc.stop(now + 0.08);
-        } else if (type === 'undo') {
-          // Retro undo chirp
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(380, now);
-          osc.frequency.exponentialRampToValueAtTime(190, now + 0.1);
-          gain.gain.setValueAtTime(0.09, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start(now);
-          osc.stop(now + 0.1);
-        } else if (type === 'win') {
-          // Victory 4-note arpeggio (C5, E5, G5, C6)
-          const notes = [523.25, 659.25, 783.99, 1046.50];
-          notes.forEach((freq, idx) => {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            const start = now + idx * 0.11;
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(freq, start);
-            gain.gain.setValueAtTime(0.1, start);
-            gain.gain.exponentialRampToValueAtTime(0.001, start + 0.22);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(start);
-            osc.stop(start + 0.22);
-          });
+          osc.stop(now + 0.09);
         }
       } catch (e) {
-        // Audio policy or unsupported - silent fallback
+        // Silent fallback
       }
     }
 
@@ -944,10 +1373,12 @@
       moveCount: 0,
       isWon: false,
       hoveredCell: null,
+      isAnimating: false,
 
       init() {
         this.cacheDOM();
         this.bindEvents();
+        this.updateSoundButtonUI();
         this.renderStartScreenLevels();
         this.renderModalLevels();
       },
@@ -957,6 +1388,7 @@
           startScreen: document.getElementById('start-screen'),
           gameScreen: document.getElementById('game-screen'),
           winModal: document.getElementById('win-modal'),
+          tutorialModal: document.getElementById('tutorial-modal'),
           levelsModal: document.getElementById('levels-modal'),
           startLevelList: document.getElementById('start-level-list'),
           modalLevelList: document.getElementById('modal-level-list'),
@@ -968,8 +1400,13 @@
           hintText: document.getElementById('hint-text'),
           winLevelName: document.getElementById('win-level-name'),
           winMovesCount: document.getElementById('win-moves-count'),
+          winParCount: document.getElementById('win-par-count'),
           winParSummary: document.getElementById('win-par-summary'),
+          winMessage: document.getElementById('win-message'),
           btnMainPlay: document.getElementById('btn-main-play'),
+          btnStartHowToPlay: document.getElementById('btn-start-how-to-play'),
+          btnGameHowToPlay: document.getElementById('btn-game-how-to-play'),
+          btnCloseTutorial: document.getElementById('btn-close-tutorial'),
           btnBackToMenu: document.getElementById('btn-back-to-menu'),
           btnSoundToggle: document.getElementById('btn-sound-toggle'),
           btnToggleHint: document.getElementById('btn-toggle-hint'),
@@ -990,13 +1427,34 @@
           this.startLevel(0);
         });
 
+        this.dom.btnStartHowToPlay.addEventListener('click', () => {
+          this.openTutorialModal();
+        });
+
+        this.dom.btnGameHowToPlay.addEventListener('click', () => {
+          this.openTutorialModal();
+        });
+
+        this.dom.btnCloseTutorial.addEventListener('click', () => {
+          try {
+            localStorage.setItem('mirror_slide_tutorial_seen', 'true');
+          } catch (e) {}
+          this.closeTutorialModal();
+        });
+
         this.dom.btnBackToMenu.addEventListener('click', () => {
           this.showScreen('start');
         });
 
         this.dom.btnSoundToggle.addEventListener('click', () => {
           isSoundMuted = !isSoundMuted;
-          this.dom.btnSoundToggle.textContent = isSoundMuted ? '🔇 OFF' : '🔊 ON';
+          try {
+            localStorage.setItem('mirror_slide_sound_muted', isSoundMuted ? 'true' : 'false');
+          } catch (e) {}
+          this.updateSoundButtonUI();
+          if (!isSoundMuted) {
+            playSound('tile-click');
+          }
         });
 
         this.dom.btnToggleHint.addEventListener('click', () => {
@@ -1060,18 +1518,31 @@
                   this.executeMove(this.hoveredCell, dir);
                 } else {
                   // Find any tile that can legally move in this direction
+                  let moved = false;
                   for (let c = 0; c < 16; c++) {
                     if (getLegalDirections(this.boardState, c).includes(dir)) {
                       e.preventDefault();
                       this.executeMove(c, dir);
+                      moved = true;
                       break;
                     }
+                  }
+                  if (!moved) {
+                    // Illegal move feedback
+                    playSound('bump');
                   }
                 }
               }
             }
           }
         });
+      },
+
+      updateSoundButtonUI() {
+        if (this.dom.btnSoundToggle) {
+          this.dom.btnSoundToggle.textContent = isSoundMuted ? '🔇 OFF' : '🔊 ON';
+          this.dom.btnSoundToggle.setAttribute('aria-pressed', isSoundMuted ? 'false' : 'true');
+        }
       },
 
       showScreen(screen) {
@@ -1098,6 +1569,7 @@
         this.moveCount = 0;
         this.isWon = false;
         this.hoveredCell = null;
+        this.isAnimating = false;
 
         // Update headers & hints
         const par = levelData.optimal || (levelData.solution ? levelData.solution.length : '-');
@@ -1113,22 +1585,35 @@
         this.showScreen('game');
         this.renderStartScreenLevels();
         this.renderModalLevels();
+
+        // Show tutorial automatically on the first level if never seen
+        if (levelIndex === 0) {
+          let seen = false;
+          try {
+            seen = localStorage.getItem('mirror_slide_tutorial_seen') === 'true';
+          } catch (e) {}
+          if (!seen) {
+            this.openTutorialModal();
+          }
+        }
       },
 
       restartLevel() {
+        if (this.isAnimating) return;
         const levelData = window.LEVELS[this.currentLevelIndex];
         this.boardState = [...levelData.start];
         this.history = [];
         this.moveCount = 0;
         this.isWon = false;
         this.hoveredCell = null;
+        this.isAnimating = false;
         this.updateStats();
         this.renderBoard();
         playSound('undo');
       },
 
       undoMove() {
-        if (this.history.length === 0) return;
+        if (this.isAnimating || this.history.length === 0) return;
         const prevState = this.history.pop();
         this.boardState = prevState;
         this.moveCount = Math.max(0, this.moveCount - 1);
@@ -1141,31 +1626,70 @@
 
       updateStats() {
         this.dom.moveCounterDisplay.textContent = this.moveCount;
-        this.dom.btnUndo.disabled = (this.history.length === 0);
+        this.dom.btnUndo.disabled = (this.history.length === 0 || this.isAnimating);
       },
 
       executeMove(cell, direction) {
+        if (this.isAnimating) return;
+
         const nextState = applyMove(this.boardState, cell, direction);
-        if (!nextState) return; // Illegal move
-
-        // Save current state for undo
-        this.history.push([...this.boardState]);
-        this.boardState = nextState;
-        this.moveCount++;
-        this.updateStats();
-        playSound('slide');
-
-        // Check win condition
-        if (isSolved(this.boardState)) {
-          this.isWon = true;
-          this.renderBoard();
-          setTimeout(() => {
-            playSound('win');
-            this.showWinModal();
-          }, 180);
-        } else {
-          this.renderBoard();
+        if (!nextState) {
+          // Illegal move: provide bump audio and tactile visual shake
+          playSound('bump');
+          const tileEl = this.dom.boardGrid.querySelector(`.tile[data-cell="${cell}"]`);
+          if (tileEl) {
+            tileEl.classList.remove('tile-bump');
+            void tileEl.offsetWidth; // Trigger reflow
+            tileEl.classList.add('tile-bump');
+            setTimeout(() => {
+              if (tileEl) tileEl.classList.remove('tile-bump');
+            }, 200);
+          }
+          return;
         }
+
+        // Move is legal: Lock interactions during the 120ms slide animation
+        this.isAnimating = true;
+
+        // Sound effects: Tactile tile click + resonant mirror ping
+        playSound('tile-click');
+        setTimeout(() => playSound('mirror-ping'), 25);
+
+        // Calculate mirror cell and inverted direction
+        const mirrorCell = getMirrorCell(cell);
+        const dirObj = DIRS[direction.toLowerCase()];
+        const mirrorDir = dirObj.opposite;
+
+        const tile1El = this.dom.boardGrid.querySelector(`.tile[data-cell="${cell}"]`);
+        const tile2El = this.dom.boardGrid.querySelector(`.tile[data-cell="${mirrorCell}"]`);
+
+        if (tile1El) {
+          tile1El.classList.add(`sliding-${direction}`);
+        }
+        if (tile2El) {
+          tile2El.classList.add(`sliding-${mirrorDir}`, 'ghost-slide');
+        }
+
+        // After the 120ms slide completes, commit state and re-render
+        setTimeout(() => {
+          this.history.push([...this.boardState]);
+          this.boardState = nextState;
+          this.moveCount++;
+          this.updateStats();
+          this.isAnimating = false;
+
+          // Check win condition
+          if (isSolved(this.boardState)) {
+            this.isWon = true;
+            this.renderBoard();
+            setTimeout(() => {
+              playSound('win');
+              this.showWinModal();
+            }, 100);
+          } else {
+            this.renderBoard();
+          }
+        }, 120);
       },
 
       renderBoard() {
@@ -1184,6 +1708,11 @@
             blankEl.className = 'slot-blank';
             blankEl.title = `Blank Slot (${cell})`;
             cellEl.appendChild(blankEl);
+
+            // Clicking empty slot gives subtle bump
+            blankEl.addEventListener('click', () => {
+              if (!this.isAnimating) playSound('bump');
+            });
           } else {
             // Tile
             const tileEl = document.createElement('div');
@@ -1198,9 +1727,13 @@
 
             const legalDirs = getLegalDirections(this.boardState, cell);
 
-            // Partner highlight sync
-            if (this.hoveredCell !== null && (cell === this.hoveredCell || cell === getMirrorCell(this.hoveredCell))) {
-              tileEl.classList.add('partner-highlight');
+            // Active hover and Partner ghost highlight sync
+            if (this.hoveredCell !== null) {
+              if (cell === this.hoveredCell) {
+                tileEl.classList.add('hover-active');
+              } else if (cell === getMirrorCell(this.hoveredCell)) {
+                tileEl.classList.add('partner-ghost');
+              }
             }
 
             if (legalDirs.length === 1) {
@@ -1227,7 +1760,7 @@
             } else if (legalDirs.length > 1) {
               // Dual-blank adjacency: Show two small directional arrows
               tileEl.classList.add('dual-choice');
-              tileEl.title = `Touches both blanks! Choose an arrow direction.`;
+              tileEl.title = `Touches both blanks! Choose an arrow direction or tap closer to blank.`;
 
               const arrowsBox = document.createElement('div');
               arrowsBox.className = 'dual-arrows-container';
@@ -1258,7 +1791,7 @@
                 this.refreshHighlights();
               });
 
-              // Allow clicking anywhere on the tile body: slides in the direction closest to the click
+              // Allow clicking anywhere on the tile body: slides in the direction closest to the click point
               tileEl.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const rect = tileEl.getBoundingClientRect();
@@ -1276,6 +1809,12 @@
                 }
                 this.executeMove(cell, bestDir);
               });
+            } else {
+              // Not movable: clicking triggers illegal bump feedback
+              tileEl.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.executeMove(cell, 'up'); // Will trigger illegal move bump
+              });
             }
 
             cellEl.appendChild(tileEl);
@@ -1289,10 +1828,13 @@
         const tiles = this.dom.boardGrid.querySelectorAll('.tile');
         tiles.forEach(tile => {
           const cell = parseInt(tile.dataset.cell, 10);
-          if (this.hoveredCell !== null && (cell === this.hoveredCell || cell === getMirrorCell(this.hoveredCell))) {
-            tile.classList.add('partner-highlight');
-          } else {
-            tile.classList.remove('partner-highlight');
+          tile.classList.remove('hover-active', 'partner-ghost');
+          if (this.hoveredCell !== null) {
+            if (cell === this.hoveredCell) {
+              tile.classList.add('hover-active');
+            } else if (cell === getMirrorCell(this.hoveredCell)) {
+              tile.classList.add('partner-ghost');
+            }
           }
         });
       },
@@ -1303,12 +1845,36 @@
         this.dom.winLevelName.textContent = lvl.name;
         this.dom.winMovesCount.textContent = this.moveCount;
 
+        if (this.dom.winParCount) {
+          this.dom.winParCount.textContent = par !== null ? par : '-';
+        }
+
+        // Compute performance and celebratory one-line message
+        let oneLiner = '';
+        if (this.currentLevelIndex === window.LEVELS.length - 1) {
+          oneLiner = '👑 GRAND CHAMPION! You conquered all mirror dimensions!';
+        } else if (par !== null) {
+          const diff = this.moveCount - par;
+          if (diff <= 0) {
+            oneLiner = '★ FLAWLESS REFLECTION! Optimal solution matched! ★';
+          } else if (diff === 1) {
+            oneLiner = '★ SO CLOSE! Just 1 step above par! ★';
+          } else if (diff <= 3) {
+            oneLiner = '★ GREAT JOB! Can you trim it down to par? ★';
+          } else {
+            oneLiner = '★ SOLVED! Reflection puzzle conquered! ★';
+          }
+        } else {
+          oneLiner = '★ SOLVED! Reflection puzzle conquered! ★';
+        }
+
+        if (this.dom.winMessage) {
+          this.dom.winMessage.textContent = oneLiner;
+        }
+
         if (this.dom.winParSummary) {
           if (par !== null) {
-            let parMsg = `Par: ${par} moves`;
-            if (this.moveCount <= par) {
-              parMsg += ` ★ PAR MATCHED! ★`;
-            }
+            let parMsg = (this.moveCount <= par) ? '★ Optimal par achieved!' : `Par is ${par} moves.`;
             this.dom.winParSummary.textContent = parMsg;
           } else {
             this.dom.winParSummary.textContent = '';
@@ -1324,6 +1890,14 @@
 
       closeWinModal() {
         this.dom.winModal.classList.remove('active');
+      },
+
+      openTutorialModal() {
+        this.dom.tutorialModal.classList.add('active');
+      },
+
+      closeTutorialModal() {
+        this.dom.tutorialModal.classList.remove('active');
       },
 
       openLevelsModal() {
