@@ -143,5 +143,4 @@ Or visit the live build instantly at: **[https://neevpanchal.github.io/Pixa-ON/]
 ---
 
 ## 📜 License
-
 Distributed under the MIT License. See `LICENSE` for more information.
